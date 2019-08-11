@@ -23,37 +23,19 @@
 <div id="formDiv" style="padding:10px;display: none;">
     <form class="layui-form" action="" id="fieldForm">
         <div class="layui-form-item">
-            <label class="layui-form-label">字段名*</label>
+            <label class="layui-form-label">类型名称</label>
             <div class="layui-input-block">
-                <input type="text" id="name" name="name" lay-verify="title" autocomplete="off" placeholder="请输入字段名" class="layui-input">
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">字段类型*</label>
-            <div class="layui-input-block">
-                <select id="type" name="type" lay-filter="typeFilter"></select>
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">长度(可选)</label>
-            <div class="layui-input-block">
-                <input type="text" id="length" name="length" lay-verify="title" autocomplete="off" placeholder="长度为0则不生成" class="layui-input" value="8">
-            </div>
-        </div>
-        <div class="layui-form-item">
-            <label class="layui-form-label">默认值(可选)</label>
-            <div class="layui-input-block">
-                <input type="text" id="value" name="value" lay-verify="title" autocomplete="off" placeholder="请输入默认值" class="layui-input">
+                <input type="text" id="name" name="name" lay-verify="title" autocomplete="off" placeholder="请输入需要新添加的类型名称" class="layui-input">
             </div>
         </div>
     </form>
 </div>
 
 <!-- 列表内按钮 -->
-<!--<script type="text/html" id="operTool">
+<script type="text/html" id="operTool">
     <a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
     <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
-</script>-->
+</script>
 
 <script src="../static/layui/layui.js" charset="utf-8"></script>
 <script src="../static/scripts/common.js"></script>
@@ -74,7 +56,7 @@
             url: common.serverUrl + '/genManager/getGenTypeList',
             page: false, //开启分页
             cols: [[ //表头
-                {field: 'id', title: '逐渐',sort: true},
+                {field: 'id', title: '主键',sort: true},
                 {field: 'name', title: '类型名称'}
             ]],
             response: {
@@ -97,13 +79,10 @@
                         type: 1,
                         content: $('#formDiv'), //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
                         btn: ['确定', '取消'],
-                        area: ['500px', '400px'],
+                        area: ['500px', '200px'],
                         offset: 't',
                         yes: function(index, layero){
-                            tableOption.data = table.cache.genTable;
-                            tableOption.data.push({"name":$("#name").val(),"type":$("#type").val(),"length":$("#length").val(),"value":$("#value").val()});
-                            table.reload('genTable',tableOption);
-                            layer.close(index);
+                            insertGenType();
                         }
                     });
                     break;
@@ -123,43 +102,22 @@
             }
         });
 
-        //生成提交
-        form.on('submit(genBtn)', function(data){
-            var param = data.field;
-            param.fields = [];
-            var tmp = table.cache.genTable;
-            for (var i = 0; i < tmp.length; i++) {
-                if (!Array.isArray(tmp[i])) {
-                    param.fields.push(tmp[i]);
-                }
-            }
-
+        //添加确定
+        function insertGenType() {
             $.ajax({
                 type: 'POST',
-                url: common.serverUrl + '/generator/genInsertSql',
-                data : JSON.stringify(param),
+                url: common.serverUrl + '/genManager/insertGenType',
+                data : JSON.stringify({"name":$("#name").val()}),
                 contentType: "application/json;charset=utf-8",
                 dataType: 'json',
                 success: function(o) {
-                    layer.open({
-                        title: '生成的数据',
-                        area: ['800px', '400px'],
-                        offset: 't',
-                        type: 0,
-                        content: o.data
-                    });
+                    table.render(tableOption);
+                    layer.closeAll();
+                    layer.alert("添加成功");
                 }
             });
-            return false;
-        });
-
-
-
-        var databaseTypeSelect = [{"name":"Oracle","value":1},{"name":"SqlServer","value":2},{"name":"Mysql","value":3}];
-
-        for (var i = 0; i < databaseTypeSelect.length; i++) {
-            $("#dataBaseType").append("<option value=\"" + databaseTypeSelect[i].value + "\">" + databaseTypeSelect[i].name + "</option>");
         }
+
 
         var fieldType = [
             {"name":"主键","value":0},{"name":"用户名","value":1},{"name":"整数","value":2},
@@ -172,18 +130,6 @@
             $("#type").append("<option value=\"" + fieldType[i].value + "\">" + fieldType[i].name + "</option>");
         }
         form.render("select");
-
-
-        /**
-         * 值转换成文字
-         */
-        function getSelectNameByValue(fieldList,value) {
-            for (var i = 0; i < fieldList.length; i++) {
-                if (fieldList[i].value == value) {
-                    return fieldList[i].name;
-                }
-            }
-        }
 
     });
 </script>
