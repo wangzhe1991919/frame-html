@@ -164,7 +164,7 @@
 
             $.ajax({
                 type: 'POST',
-                url: common.serverUrl + '/generator/getGenTypeList',
+                url: common.serverUrl + '/generator/genInsertSql',
                 data : JSON.stringify(param),
                 contentType: "application/json;charset=utf-8",
                 dataType: 'json',
