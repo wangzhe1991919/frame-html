@@ -57,7 +57,8 @@
             page: false, //开启分页
             cols: [[ //表头
                 {field: 'id', title: '主键',sort: true},
-                {field: 'name', title: '类型名称'}
+                {field: 'name', title: '类型名称'},
+                {field: 'toolbar', title: '操作', toolbar:'#operTool'}
             ]],
             response: {
                 statusCode: 200 //规定成功的状态码，默认：0
@@ -93,9 +94,11 @@
             var data = obj.data;
             if(obj.event === 'del'){
                 layer.confirm('确定删除？', function(index){
-                    obj.del();
-                    table.render();
-                    layer.close(index);
+                    common.ajaxDefault($,common.url.deleteGenType,{"id":data.id},"DELETE",function(o){
+                        table.render(tableOption);
+                        layer.closeAll();
+                        layer.alert("删除成功");
+                    })
                 });
             } else if(obj.event === 'edit'){
                 layer.alert('编辑行：<br>'+ JSON.stringify(data))
@@ -104,17 +107,10 @@
 
         //添加确定
         function insertGenType() {
-            $.ajax({
-                type: 'POST',
-                url: common.serverUrl + '/genManager/insertGenType',
-                data : JSON.stringify({"name":$("#name").val()}),
-                contentType: "application/json;charset=utf-8",
-                dataType: 'json',
-                success: function(o) {
-                    table.render(tableOption);
-                    layer.closeAll();
-                    layer.alert("添加成功");
-                }
+            common.ajaxObj($,common.url.insertGenType,{"name":$("#name").val()},"POST",function(o){
+                table.render(tableOption);
+                layer.closeAll();
+                layer.alert("添加成功");
             });
         }
 
