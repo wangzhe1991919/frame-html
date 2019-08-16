@@ -4,17 +4,34 @@ var common = {
     url : {
         getData : "/getData",
         insertGenType : "/genManager/insertGenType",
-        deleteGenType : "/genManager/deleteGenType"
+        deleteGenType : "/genManager/deleteGenType",
+        getGenTypeList : "/genManager/getGenTypeList",
+        getGenDataList : "/genManager/getGenDataList"
     },
 
+    /**
+     * layui的不分页的Option
+     */
+    getNopageTableOption : function(elem,url,cols,defaultbar) {
+      var option = {};
+        option.elem = elem;
+        option.url = common.serverUrl + url;
+        option.method = 'post';
+        option.cols = [cols];
+        option.toolbar = 'default';
+        option.height = 450;
+        if (!defaultbar) {
+            option.defaultToolbar = [];
+        }
+        option.page = false;
+        option.response = {
+            statusCode: 200
+        }
+        return option;
+    },
 
     /**
      * 公共ajax
-     * @param url
-     * @param param
-     * @param type
-     * @param callback  回调函数
-     * @param contentType
      */
     ajaxObj : function($,url,param,type,callback,contentType) {
         if (!type) {
@@ -38,10 +55,6 @@ var common = {
 
     /**
      * 参数式ajax请求调用
-     * @param url
-     * @param param
-     * @param type
-     * @param callback
      */
     ajaxDefault : function($,url,param,type,callback) {
         common.ajaxObj($,url,param,type,callback,"application/x-www-form-urlencoded");
