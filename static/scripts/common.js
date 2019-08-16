@@ -58,7 +58,22 @@ var common = {
      */
     ajaxDefault : function($,url,param,type,callback) {
         common.ajaxObj($,url,param,type,callback,"application/x-www-form-urlencoded");
-    }
+    },
 
+    /**
+     * 弹出窗体
+     */
+    layerOpen : function(layerObj,$,domId,height,width,yesCallBack) {
+        layerObj.open({
+            type: 1,
+            content:$("#" + domId), //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
+            btn: ['确定', '取消'],
+            area: [height + 'px', width + 'px'],
+            offset: 't',
+            yes: function(index, layero){
+                yesCallBack();
+            }
+        });
+    }
 
 }

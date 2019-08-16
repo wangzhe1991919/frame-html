@@ -25,7 +25,7 @@
 
 
 <!-- 字段表单 -->
-<div id="formDiv" style="padding:10px;display: none;">
+<div id="dataFormDiv" style="padding:10px;display: none;">
     <form class="layui-form" action="" id="fieldForm">
         <div class="layui-form-item">
             <label class="layui-form-label">类型名称</label>
@@ -46,6 +46,9 @@
 <script src="../static/scripts/common.js"></script>
 
 <!-- 注意：如果你直接复制所有代码到本地，上述js路径需要改成你本地的 -->
+</body>
+</html>
+
 <script>
     layui.use(['table','layer','form'], function(){
         var form = layui.form;
@@ -75,16 +78,15 @@
         table.on('toolbar(genFilterTypeTable)', function(obj){
             switch(obj.event){
                 case 'add':
-                    layer.open({
-                        type: 1,
-                        content: $('#formDiv'), //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
-                        btn: ['确定', '取消'],
-                        area: ['500px', '200px'],
-                        offset: 't',
-                        yes: function(index, layero){
-                            insertGenType();
-                        }
+                    common.layerOpen(layer,$,'dataFormDiv',500,200,function() {
+                        insertGenType();
                     });
+                    break;
+                case 'delete' :
+                    alert("shsnchu");
+                    break;
+                case 'update' :
+                    alert("编辑");
                     break;
             };
         });
@@ -137,5 +139,3 @@
 
     });
 </script>
-</body>
-</html>
