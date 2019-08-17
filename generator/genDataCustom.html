@@ -24,15 +24,39 @@
 </div>
 
 
-<!-- 字段表单 -->
-<div id="dataFormDiv" style="padding:10px;display: none;">
-    <form class="layui-form" action="" id="fieldForm">
+<!-- 类型表单 -->
+<div id="typeFormDiv" style="padding:10px;display: none;">
+    <form class="layui-form" action="" id="typeForm">
         <div class="layui-form-item">
             <label class="layui-form-label">类型名称</label>
             <div class="layui-input-block">
-                <input type="text" id="name" name="name" lay-verify="title" autocomplete="off" placeholder="请输入需要新添加的类型名称" class="layui-input">
+                <input type="text" id="typeName" name="name" lay-verify="title" autocomplete="off" placeholder="请输入需要新添加的类型名称" class="layui-input">
             </div>
         </div>
+    </form>
+</div>
+<!-- 数据表单 -->
+<div id="dataFormDiv" style="padding:10px;display: none;">
+    <form class="layui-form" action="" id="dataForm">
+        <div class="layui-form-item">
+            <label class="layui-form-label">所属类型</label>
+            <div class="layui-input-block">
+                <select id="genTypeId" name="genTypeId" lay-filter="genTypeId"></select>
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">分隔符</label>
+            <div class="layui-input-block">
+                <input type="text" id="split" name="split" lay-verify="split" value="," autocomplete="off" placeholder="请输入数据分隔符" class="layui-input">
+            </div>
+        </div>
+        <div class="layui-form-item">
+            <label class="layui-form-label">数据</label>
+            <div class="layui-input-block">
+                <textarea name="contend" placeholder="请输入内容" class="layui-textarea" rows="16"></textarea>
+            </div>
+        </div>
+
     </form>
 </div>
 
@@ -60,7 +84,11 @@
             {field: 'id', title: '主键',sort: true},
             {field: 'name', title: '类型名称'},
             {field: 'toolbar', title: '操作', toolbar:'#operTool'}
-        ]);
+        ],null,
+            //数据加载完成后的回调函数
+        function afterdone(res, curr, count) {
+            common.setSelect($,form,'genTypeId',res.data);
+        });
 
         var dataTableOption = common.getNopageTableOption('#genDataTable',common.url.getGenDataList,[
             {type:'checkbox'},
@@ -74,16 +102,26 @@
         table.render(typeTableOption);
         var dataTableObj = table.render(dataTableOption);
 
-        //监听头工具栏事件
+        //类型列表监听头工具栏事件
         table.on('toolbar(genFilterTypeTable)', function(obj){
             switch(obj.event){
                 case 'add':
-                    common.layerOpen(layer,$,'dataFormDiv',500,200,function() {
+                    common.layerOpen(layer,$,'typeFormDiv',500,200,function() {
                         insertGenType();
                     });
                     break;
+            }
+        });
+        //数据列表监听头工具栏事件
+        table.on('toolbar(genFilterDataTable)', function(obj){
+            switch(obj.event){
+                case 'add':
+                    common.layerOpen(layer,$,'dataFormDiv',500,600,function() {
+                        alert("添加数据");
+                    });
+                    break;
                 case 'delete' :
-                    alert("shsnchu");
+                    alert("删除");
                     break;
                 case 'update' :
                     alert("编辑");
@@ -115,7 +153,7 @@
             }
         });
 
-        //添加确定
+        //类型添加确定
         function insertGenType() {
             common.ajaxObj($,common.url.insertGenType,{"name":$("#name").val()},"POST",function(o){
                 table.render(typeTableOption);
@@ -131,11 +169,7 @@
             {"name":"地址","value":7},{"name":"手机号","value":8},{"name":"身份证号","value":9},
             {"name":"英文字符串","value":10}
         ];
-
-        for (var i = 0; i < fieldType.length; i++) {
-            $("#type").append("<option value=\"" + fieldType[i].value + "\">" + fieldType[i].name + "</option>");
-        }
-        form.render("select");*/
+        ;*/
 
     });
 </script>

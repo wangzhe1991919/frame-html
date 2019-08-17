@@ -6,13 +6,15 @@ var common = {
         insertGenType : "/genManager/insertGenType",
         deleteGenType : "/genManager/deleteGenType",
         getGenTypeList : "/genManager/getGenTypeList",
-        getGenDataList : "/genManager/getGenDataList"
+        getGenDataList : "/genManager/getGenDataList",
+        insertGenData : "/genManager/insertGenData"
+
     },
 
     /**
      * layui的不分页的Option
      */
-    getNopageTableOption : function(elem,url,cols,defaultbar) {
+    getNopageTableOption : function(elem,url,cols,defaultbar,doneCallback) {
       var option = {};
         option.elem = elem;
         option.url = common.serverUrl + url;
@@ -26,6 +28,9 @@ var common = {
         option.page = false;
         option.response = {
             statusCode: 200
+        }
+        if (doneCallback) {
+            option.done = doneCallback;
         }
         return option;
     },
@@ -74,6 +79,15 @@ var common = {
                 yesCallBack();
             }
         });
+    },
+    /**
+     * 生成select 的option
+     */
+    setSelect : function ($,form,domId,data) {
+        for (var i = 0; i < data.length; i++) {
+            $("#" + domId).append("<option value=\"" + data[i].id + "\">" + data[i].name + "</option>");
+            form.render("select");
+        }
     }
 
 }
