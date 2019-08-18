@@ -37,7 +37,7 @@
 </div>
 <!-- 数据表单 -->
 <div id="dataFormDiv" style="padding:10px;display: none;">
-    <form class="layui-form" action="" id="dataForm">
+    <form class="layui-form" action="" id="dataForm" lay-filter="dataForm">
         <div class="layui-form-item">
             <label class="layui-form-label">所属类型</label>
             <div class="layui-input-block">
@@ -53,7 +53,7 @@
         <div class="layui-form-item">
             <label class="layui-form-label">数据</label>
             <div class="layui-input-block">
-                <textarea name="contend" placeholder="请输入内容" class="layui-textarea" rows="16"></textarea>
+                <textarea id="content" name="content" placeholder="请输入内容" class="layui-textarea" rows="16"></textarea>
             </div>
         </div>
 
@@ -79,6 +79,8 @@
         var table = layui.table;
         var $ = layui.jquery;
         var layer = layui.layer; //独立版的layer无需执行这一句
+
+        var _currDataType = null;
 
         var typeTableOption = common.getNopageTableOption('#genTypeTable',common.url.getGenTypeList,[
             {field: 'id', title: '主键',sort: true},
@@ -116,8 +118,21 @@
         table.on('toolbar(genFilterDataTable)', function(obj){
             switch(obj.event){
                 case 'add':
+                    if (_currDataType) {
+                        $("#genTypeId").val(_currDataType);
+                        form.render("select");
+                    }
                     common.layerOpen(layer,$,'dataFormDiv',500,600,function() {
-                        alert("添加数据");
+                        common.ajaxDefault($,common.url.insertGenData,{"genTypeId":$("#genTypeId").val(),"split":$("#split").val(),"content":$("#content").val()},"POST",function (o) {
+                            _currDataType = $("#genTypeId").val();
+                            dataTableObj.reload({
+                                where : {
+                                    "genTypeId" : _currDataType
+                                }
+                            });
+                            layer.closeAll();
+                            layer.alert(o.message);
+                        });
                     });
                     break;
                 case 'delete' :
@@ -131,6 +146,7 @@
 
         //监听行的点击事件
         table.on('row(genFilterTypeTable)', function(obj){
+            _currDataType = obj.data.id;
             dataTableObj.reload({
                 where : {
                     "genTypeId" : obj.data.id
@@ -155,13 +171,12 @@
 
         //类型添加确定
         function insertGenType() {
-            common.ajaxObj($,common.url.insertGenType,{"name":$("#name").val()},"POST",function(o){
+            common.ajaxObj($,common.url.insertGenType,{"name":$("#typeName").val()},"POST",function(o){
                 table.render(typeTableOption);
                 layer.closeAll();
                 layer.alert("添加成功");
             });
         }
-
 
         /*var fieldType = [
             {"name":"主键","value":0},{"name":"用户名","value":1},{"name":"整数","value":2},

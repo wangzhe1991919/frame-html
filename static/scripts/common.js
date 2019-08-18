@@ -62,7 +62,7 @@ var common = {
      * 参数式ajax请求调用
      */
     ajaxDefault : function($,url,param,type,callback) {
-        common.ajaxObj($,url,param,type,callback,"application/x-www-form-urlencoded");
+        common.ajaxObj($,url,param,type,callback,"application/x-www-form-urlencoded;charset=utf-8");
     },
 
     /**
