@@ -7,8 +7,8 @@ var common = {
         deleteGenType : "/genManager/deleteGenType",
         getGenTypeList : "/genManager/getGenTypeList",
         getGenDataList : "/genManager/getGenDataList",
-        insertGenData : "/genManager/insertGenData"
-
+        insertGenData : "/genManager/insertGenData",
+        deleteGenData : "/genManager/deleteGenData"
     },
 
     /**

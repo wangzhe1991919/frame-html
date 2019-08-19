@@ -96,8 +96,7 @@
             {type:'checkbox'},
             {field: 'id', title: '主键',sort: true},
             {field: 'genTypeId', title: '所属类型'},
-            {field: 'content', title: '内容'},
-            {field: 'toolbar', title: '操作', toolbar:'#operTool'}
+            {field: 'content', title: '内容'}
         ]);
 
         //渲染列表
@@ -136,10 +135,30 @@
                     });
                     break;
                 case 'delete' :
-                    alert("删除");
+                    var checkStatus = table.checkStatus('genDataTable');
+                    if (checkStatus.data.length <= 0) {
+                        layer.alert("请选择数据");
+                    } else {
+                        var param = [];
+                        for (var i = 0; i < checkStatus.data.length; i++) {
+                            param.push(checkStatus.data[i].id);
+                        }
+                        common.ajaxDefault($,common.url.deleteGenData,{"ids" : param},"DELETE",function(o) {
+                            dataTableObj.reload({
+                                where : {
+                                    "genTypeId" : _currDataType
+                                }
+                            });
+                            layer.closeAll();
+                            layer.alert(o.message);
+                        })
+                    }
                     break;
                 case 'update' :
-                    alert("编辑");
+                    var checkStatus = table.checkStatus('genDataTable');
+                    if (checkStatus.data.length <= 0) {
+                        layer.alert("请选择数据");
+                    }
                     break;
             };
         });
