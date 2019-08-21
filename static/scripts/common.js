@@ -3,6 +3,7 @@ var common = {
     serverUrl : "http://127.0.0.1:8080",
     url : {
         getData : "/getData",
+        genInsertSql : "/generator/genInsertSql",
         insertGenType : "/genManager/insertGenType",
         deleteGenType : "/genManager/deleteGenType",
         getGenTypeList : "/genManager/getGenTypeList",
@@ -10,6 +11,19 @@ var common = {
         insertGenData : "/genManager/insertGenData",
         deleteGenData : "/genManager/deleteGenData"
     },
+
+    defaultType : [
+        {"name":"主键","value":0},
+        {"name":"用户名","value":1},
+        {"name":"整数","value":2},
+        {"name":"日期-年月日时分秒","value":3},
+        {"name":"日期-年月日","value":4},
+        {"name":"邮箱","value":6},
+        {"name":"地址","value":7},
+        {"name":"手机号","value":8},
+        {"name":"身份证号","value":9},
+        {"name":"英文字符串","value":10}
+        ],
 
     /**
      * layui的不分页的Option

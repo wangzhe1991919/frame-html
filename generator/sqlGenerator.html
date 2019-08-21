@@ -6,6 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
     <link rel="stylesheet" href="../static/layui/css/layui.css"  media="all">
+    <link rel="stylesheet" href="../static/css/common.css"  media="all">
     <!-- 注意：如果你直接复制所有代码到本地，上述css路径需要改成你本地的 -->
 </head>
 <body>
@@ -30,9 +31,13 @@
     </div>
 
     <div class="layui-form-item">
-        <label class="layui-form-label">字段类型</label>
+        <label class="layui-form-label">数据库类型</label>
         <div class="layui-input-block">
-            <select id="dataBaseType" name="dataBaseType" lay-filter="typeFilter"></select>
+            <select id="dataBaseType" name="dataBaseType" lay-filter="typeFilter">
+                <option value="1">Oracle</option>
+                <option value="2">SqlServer</option>
+                <option value="3">Mysql</option>
+            </select>
         </div>
     </div>
     <div class="layui-form-item">
@@ -104,7 +109,7 @@
                 {field: 'name', title: '字段名',sort: true},
                 {field: 'type', title: '字段类型',
                     templet : function(o) {
-                        return getSelectNameByValue(fieldType,o.type);
+                        return getSelectNameByValue(common.defaultType,o.type);
                     }
                 },
                 {field: 'length', title: '长度'},
@@ -126,6 +131,7 @@
                         content: $('#formDiv'), //这里content是一个DOM，注意：最好该元素要存放在body最外层，否则可能被其它的相对元素所影响
                         btn: ['确定', '取消'],
                         area: ['500px', '400px'],
+                        skin : 'layer-ext-myskin',
                         offset: 't',
                         yes: function(index, layero){
                             tableOption.data = table.cache.genTable;
@@ -161,45 +167,32 @@
                     param.fields.push(tmp[i]);
                 }
             }
-
-            $.ajax({
-                type: 'POST',
-                url: common.serverUrl + '/generator/genInsertSql',
-                data : JSON.stringify(param),
-                contentType: "application/json;charset=utf-8",
-                dataType: 'json',
-                success: function(o) {
-                    layer.open({
-                        title: '生成的数据',
-                        area: ['800px', '400px'],
-                        offset: 't',
-                        type: 0,
-                        content: o.data
-                    });
-                }
+            common.ajaxObj($,common.url.genInsertSql,param,'POST',function(o) {
+                layer.open({
+                    title: '生成的数据',
+                    area: ['800px', '400px'],
+                    offset: 't',
+                    type: 0,
+                    content: o.data
+                });
             });
             return false;
         });
 
-
-
-        var databaseTypeSelect = [{"name":"Oracle","value":1},{"name":"SqlServer","value":2},{"name":"Mysql","value":3}];
-
-        for (var i = 0; i < databaseTypeSelect.length; i++) {
-            $("#dataBaseType").append("<option value=\"" + databaseTypeSelect[i].value + "\">" + databaseTypeSelect[i].name + "</option>");
-        }
-
-        var fieldType = [
-            {"name":"主键","value":0},{"name":"用户名","value":1},{"name":"整数","value":2},
-            {"name":"日期-年月日时分秒","value":3},{"name":"日期-年月日","value":4},{"name":"邮箱","value":6},
-            {"name":"地址","value":7},{"name":"手机号","value":8},{"name":"身份证号","value":9},
-            {"name":"英文字符串","value":10}
-        ];
-
-        for (var i = 0; i < fieldType.length; i++) {
-            $("#type").append("<option value=\"" + fieldType[i].value + "\">" + fieldType[i].name + "</option>");
-        }
-        form.render("select");
+        //加载所有的字段类型
+        common.ajaxDefault($,common.url.getGenTypeList,null,'POST',function(o) {
+            //获取数据库中类型，添加到默认select中
+            if (o.data) {
+                for (var i = 0; i < o.data.length; i++) {
+                    common.defaultType.push({"name":o.data[i].name,"value":o.data[i].id});
+                }
+            }
+            //select渲染
+            for (var i = 0; i < common.defaultType.length; i++) {
+                $("#type").append("<option value=\"" + common.defaultType[i].value + "\">" + common.defaultType[i].name + "</option>");
+            }
+            form.render("select");
+        });
 
 
         /**

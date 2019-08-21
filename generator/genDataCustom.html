@@ -53,7 +53,7 @@
         <div class="layui-form-item">
             <label class="layui-form-label">数据</label>
             <div class="layui-input-block">
-                <textarea id="content" name="content" placeholder="请输入内容" class="layui-textarea" rows="16"></textarea>
+                <textarea id="content" name="content" placeholder="请输入内容，多条数据使用分隔符分开" class="layui-textarea" rows="14"></textarea>
             </div>
         </div>
 
@@ -121,7 +121,7 @@
                         $("#genTypeId").val(_currDataType);
                         form.render("select");
                     }
-                    common.layerOpen(layer,$,'dataFormDiv',500,600,function() {
+                    common.layerOpen(layer,$,'dataFormDiv',500,550,function() {
                         common.ajaxDefault($,common.url.insertGenData,{"genTypeId":$("#genTypeId").val(),"split":$("#split").val(),"content":$("#content").val()},"POST",function (o) {
                             _currDataType = $("#genTypeId").val();
                             dataTableObj.reload({
@@ -196,14 +196,6 @@
                 layer.alert("添加成功");
             });
         }
-
-        /*var fieldType = [
-            {"name":"主键","value":0},{"name":"用户名","value":1},{"name":"整数","value":2},
-            {"name":"日期-年月日时分秒","value":3},{"name":"日期-年月日","value":4},{"name":"邮箱","value":6},
-            {"name":"地址","value":7},{"name":"手机号","value":8},{"name":"身份证号","value":9},
-            {"name":"英文字符串","value":10}
-        ];
-        ;*/
 
     });
 </script>
