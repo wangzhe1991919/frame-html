@@ -1,7 +1,8 @@
 var common = {
-    indexPage : "http://49.234.216.89/index.html",
     //serverUrl : "http://49.234.216.89:8080",
     serverUrl : "http://127.0.0.1:8080",
+    indexPage : "http://49.234.216.89/index.html",
+    loginPage : "http://49.234.216.89/login.html",
     url : {
         login : "/sys/login",
         getData : "/getData",
@@ -69,6 +70,9 @@ var common = {
             contentType: contentType,
             dataType: 'json',
             success: function(o) {
+                if (o.code==500) {
+                    window.location.href = common.loginPage;
+                }
                 callback(o);
             }
         });
