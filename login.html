@@ -2,15 +2,35 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>login</title>
+    <script src="static/jquery/jquery-3.3.1.min.js"></script>
+    <script src="static/scripts/common.js"></script>
 </head>
+
+<script>
+    function login() {
+        var username = $("#username").val();
+        var password = $("#password").val();
+        $.ajax({
+            type: "POST",
+            url: common.serverUrl + common.url.login,
+            data : {"username":username,"password":password},
+            dataType: 'json',
+            success: function(o) {
+                if (o.code == 200) {
+                    window.location.href = common.indexPage;
+                }
+            }
+        });
+    }
+</script>
 <body>
     <form>
-        用户名：<input type="text" name="username"/>
+        用户名：<input type="text" id="username"/>
         <br/>
-        密码：<input type="password" name="password"/>
+        密码：<input type="password" id="password"/>
         <br/>
-        <input type="button" value="登录">
+        <input type="button" value="登录" onclick="login()">
     </form>
 </body>
 </html>
