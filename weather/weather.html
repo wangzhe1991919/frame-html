@@ -1,0 +1,60 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>ECharts</title>
+
+    <link rel="stylesheet" type="text/css" href="main.css">
+    <script src="../static/jquery/jquery-3.3.1.min.js"></script>
+    <script src="echarts.min.js"></script>
+	<script src="dark.js"></script>
+</head>
+<body onload="setWeatherData()">
+
+
+<div style="width:50%;height:300px;float:left;z-index:1;" id="left">
+
+    <div class="weather">
+        <div class="kqzl">&nbsp;&nbsp;<span id="city">天津</span>：实时空气质量：<span id="air">162 重度污染</span></div>
+        <div class="today">
+
+            <div><img width=60px; id="today_img"  src="https://cdn.heweather.com/cond_icon/100.png"/></div>
+            <div><span id="currTmp">11</span>℃ <span id="currWeather">晴</span>(实时)</div>
+            <div id="today_temp">3-15℃</div>
+            <div id="today_cond">多云转晴</div>
+            <div id="today_wind">西北风3-4级</div>
+        </div>
+
+        <div class="tomo">
+            <br/>
+            <div id="tomo_week">星期五</div>
+            <div><img width=40px; id="tomo_img" src="https://cdn.heweather.com/cond_icon/100.png"/></div>
+            <div id="tomo_temp">3-15℃</div>
+            <div id="tomo_cond">多云转晴</div>
+            <div id="tomo_wind">北风3-6级</div>
+        </div>
+
+        <div class="aftomo">
+            <br/>
+            <div id="aftomo_week">星期六</div>
+            <div><img width=40px; id="aftomo_img" src="https://cdn.heweather.com/cond_icon/100.png"/></div>
+            <div id="aftomo_temp">2-9℃</div>
+            <div id="aftomo_cond">阴转小雨</div>
+            <div id="aftomo_wind">东风1-2级</div>
+        </div>
+
+    </div>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="width:300px;height:140px;"></div>
+</div>
+
+<div style="width:50%;height:300px;float:left;z-index:99999">
+    <div id="date"></div>
+    <div id="ndate"></div>
+    <div id="time"></div>
+    <div id="week"></div>
+</div>
+
+<script src="weather.js"></script>
+</body>
+</html>
