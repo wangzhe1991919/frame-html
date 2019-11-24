@@ -393,7 +393,7 @@ function setWeather(weekDom,weekValue,imgDom,tempDom,condDom,windDom,dayData){
 		setHtmlValue(weekDom,getWeekPlus(weekValue));
 	}
 	setImgSrc(imgDom,"../static/weatherImg/sogou/" + dayData.wea_img + ".png");
-	setHtmlValue(tempDom,dayData.tem2 + "-" + dayData.tem1 + "℃");
+	setHtmlValue(tempDom,dayData.tem2 + "-" + dayData.tem1);
 
 	setHtmlValue(condDom,dayData.wea);
 
