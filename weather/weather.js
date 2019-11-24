@@ -418,3 +418,4 @@ function init() {
 	setWeatherQua();
 }
 
+setInterval("init()",10 * 60 * 1000);//1000为1秒钟
