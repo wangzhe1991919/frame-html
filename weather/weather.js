@@ -263,15 +263,15 @@ function getOption(arr,now) {
 
         if (now) {
             xAxisData.push("现在");
-            seriesData.push(now.tmp);
+            seriesData.push(now.tmp.split("℃")[0]);
         }
 
 		if (arr != null && arr.length>0) {
 			for (var i = 0; i < arr.length; i++) {
-				var date = arr[i].date;
-				date = date.split(" ")[1];
+				var date = arr[i].day;
 				xAxisData.push(date);
-				seriesData.push(arr[i].tmp);
+				var temp = arr[i].tem;
+				seriesData.push(temp.split("℃")[0]);
 			}
 		}
 			// 指定图表的配置项和数据
@@ -295,7 +295,7 @@ function getOption(arr,now) {
 				xAxis: {
 					type : 'category',
 					boundaryGap : false,
-					data:xAxisData.length>0?xAxisData:["0"]
+					data:xAxisData
 				},
 				yAxis: {
 					type : 'value',
@@ -328,43 +328,24 @@ function getOption(arr,now) {
 
 
 /**
- * 设置天气质量
+ * 设置实时天气质量
  */
 function setWeatherQua() {
-
-
-
 	$.ajax({
 		type: 'GET',
 		async: false,
-		url: "https://free-api.heweather.net/s6/air/now?location=tianjin&key=e0377a2128f940f5a943cd187c18c5c4",
+		url: "https://www.tianqiapi.com/api/?version=v6&cityid=tianjin&appid=52391847&appsecret=KRxZ9ijE",
 		dataType: 'json',
 		success: function(data) {
-
-			var o = data.HeWeather6[0];
-			var now = o.air_now_city;
-
+			//设置实时温度
+			setHtmlValue("currTmp",data.tem);
+			setHtmlValue("currWeather",data.wea);
 			//设置实时空气质量
-			setHtmlValue("air",now.pm25 + " " + now.qlty);
-			setBackGroundColor("air",global.aqi[now.qlty]);
-
+			setHtmlValue("air",data.air_pm25 + " " + data.air_level);
+			setBackGroundColor("air",global.aqi[data.air_level]);
 		}
 	});
-
 }
-
-/**
- * 设置未来几小时的气温数据
- */
-function setTimeDataChart() {
-	//设置chart数据
-	/*if (hourly_forecast.length >= 1) {
-		var option = getOption(hourly_forecast,now);
-		myChart.setOption(option,true);
-	}*/
-
-}
-
 
 /**
  * 设置天气数据
@@ -376,78 +357,64 @@ function setWeatherData() {
 	$.ajax({
 		type: 'GET',
 		async: false,
-		url: "https://free-api.heweather.net/s6/weather?location=tianjin&key=e0377a2128f940f5a943cd187c18c5c4",
+		url: "https://www.tianqiapi.com/api/?version=v1&cityid=tianjin&appid=52391847&appsecret=KRxZ9ijE",
 		dataType: 'json',
 		success: function(data) {
 
-			var o = data.HeWeather6[0];
-
-			//var now = o.now;
-			var today = o.daily_forecast[0];
-			var tomo = o.daily_forecast[1];
-			var aftomo = o.daily_forecast[2];
-
-
-			var now = o.now;
-			setHtmlValue("currTmp",now.tmp);
-			setHtmlValue("currWeather",now.cond_txt);
-
-
-			setHtmlValue("city",o.basic.location);
+			setHtmlValue("city",data.city);
 			//var o = JSON.parse(str);
 
 			//设置今天天气
-			setImgSrc("today_img","https://cdn.heweather.com/cond_icon/" + today.cond_code_d + ".png");
-			//setHtmlValue("currTmp",now.tmp);
-			//setHtmlValue("currWeather",now.cond_txt);
-			setHtmlValue("today_temp",today.tmp_min + "-" + today.tmp_max + "℃");
-			setHtmlValue("today_cond",today.cond_txt_d==today.cond_txt_n?today.cond_txt_d:(today.cond_txt_d + "转" + today.cond_txt_n));
-
-			var today_wind = today.wind_dir + today.wind_sc;
-			var reg = /^[\u4E00-\u9FA5]+$/;
-			if (!reg.test(today.wind_sc)) {
-				//不是中文，加级
-				today_wind += "级";
-			}
-			setHtmlValue("today_wind",today_wind);
+			setWeather(null,null,"today_img","today_temp","today_cond","today_wind",data.data[0]);
+			//设置今天的气温曲线
+			var option = getOption(data.data[0].hours);
+			myChart.setOption(option,false);
 
 			//设置明天天气
-			setHtmlValue("tomo_week",getWeekPlus(1));
-			setImgSrc("tomo_img","https://cdn.heweather.com/cond_icon/" + tomo.cond_code_d + ".png")
-			setHtmlValue("tomo_temp",tomo.tmp_min + "-" + tomo.tmp_max + "℃");
-			setHtmlValue("tomo_cond",tomo.cond_txt_d==tomo.cond_txt_n?tomo.cond_txt_d:(tomo.cond_txt_d + "转" + tomo.cond_txt_n));
-
-			var tomo_wind = tomo.wind_dir + tomo.wind_sc;
-			var reg = /^[\u4E00-\u9FA5]+$/;
-			if (!reg.test(tomo.wind_sc)) {
-				//不是中文，加级
-				tomo_wind += "级";
-			}
-			setHtmlValue("tomo_wind",tomo_wind);
+			setWeather("tomo_week",1,"tomo_img","tomo_temp","tomo_cond","tomo_wind",data.data[1]);
 
 			//设置后天天气
-			setHtmlValue("aftomo_week",getWeekPlus(2));
-			setImgSrc("aftomo_img","https://cdn.heweather.com/cond_icon/" + aftomo.cond_code_d + ".png")
-			setHtmlValue("aftomo_temp",aftomo.tmp_min + "-" + aftomo.tmp_max + "℃");
-			setHtmlValue("aftomo_cond",aftomo.cond_txt_d==aftomo.cond_txt_n?aftomo.cond_txt_d:(aftomo.cond_txt_d + "转" + aftomo.cond_txt_n));
+			setWeather("aftomo_week",2,"aftomo_img","aftomo_temp","aftomo_cond","aftomo_wind",data.data[2]);
 
-			var aftomo_wind = aftomo.wind_dir + aftomo.wind_sc;
-			var reg = /^[\u4E00-\u9FA5]+$/;
-			if (!reg.test(aftomo.wind_sc)) {
-				//不是中文，加级
-				aftomo_wind += "级";
-			}
-			setHtmlValue("aftomo_wind",aftomo_wind);
 		}
 	});
 
+}
 
+/**
+ * 设置天气
+ * @param weekDom
+ * @param imgDom
+ * @param tempDon
+ * @param condDom
+ */
+function setWeather(weekDom,weekValue,imgDom,tempDom,condDom,windDom,dayData){
+	if (weekDom && weekValue) {
+		setHtmlValue(weekDom,getWeekPlus(weekValue));
+	}
+	setImgSrc(imgDom,"../static/weatherImg/sogou/" + dayData.wea_img + ".png");
+	setHtmlValue(tempDom,dayData.tem2 + "-" + dayData.tem1 + "℃");
 
+	setHtmlValue(condDom,dayData.wea);
+
+	var wind = dayData.win;
+	var winStr = "";
+	if (wind[0] == wind[1]) {
+		winStr = wind[0];
+	} else {
+		winStr = wind[0] + "转" + wind[1];
+	}
+	setHtmlValue(windDom,winStr);
+
+	var level = dayData.win_speed;
+	if (level.indexOf("转") > -1) {
+		level = level.split("转")[0];
+	}
+	setHtmlValue(windDom,winStr + level);
 }
 
 function init() {
 	setWeatherData();
 	setWeatherQua();
-	setTimeDataChart();
 }
 
