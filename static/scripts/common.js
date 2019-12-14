@@ -1,6 +1,6 @@
 var common = {
     //serverUrl : "http://49.234.216.89:8080",
-    serverUrl : "http://127.0.0.1:8080",
+    serverUrl : "http://49.234.216.89:8080",
     indexPage : "http://49.234.216.89/index.html",
     loginPage : "http://49.234.216.89/login.html",
     url : {
@@ -71,7 +71,7 @@ var common = {
             dataType: 'json',
             success: function(o) {
                 if (o.code == 302) {
-                    window.location.href = common.loginPage;
+                    top.window.location.href = common.loginPage;
                 }
                 if (o.code == 500) {
                     window.location.href = common.loginPage;
