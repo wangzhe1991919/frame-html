@@ -1,6 +1,5 @@
 var common = {
-    //serverUrl : "http://49.234.216.89:8080",
-    serverUrl : "http://49.234.216.89:8080",
+    serverUrl : "http://49.234.216.89",
     indexPage : "http://49.234.216.89/index.html",
     loginPage : "http://49.234.216.89/login.html",
     url : {
