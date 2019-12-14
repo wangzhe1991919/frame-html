@@ -70,7 +70,10 @@ var common = {
             contentType: contentType,
             dataType: 'json',
             success: function(o) {
-                if (o.code==500) {
+                if (o.code == 302) {
+                    window.location.href = common.loginPage;
+                }
+                if (o.code == 500) {
                     window.location.href = common.loginPage;
                 }
                 callback(o);
