@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>导航分组</title>
+    <script src="../static/jquery/jquery-3.3.1.min.js"></script>
+    <script src="../static/scripts/common.js"></script>
+</head>
+<body>
+
+        名称*：<input id="name" type="text"><br/>
+        排序*：<input id="sort" type="number"><br/>
+        <input type="button" onclick="add()" value="提交">
+        <input type="button" onclick="back()" value="返回">
+
+</body>
+</html>
+<script>
+
+    function add() {
+        var name = $("#name").val();
+        var sort = $("#sort").val();
+        if (!name || !sort) {
+            alert("都必填");
+            return;
+        }
+        common.ajaxObj($,common.url.insertSysNavigationGroup,{"name":name,"sort":sort},"POST",function(o){
+           if (o.code == 200) {
+               alert("添加成功");
+           } else {
+               alert(o.message);
+           }
+        });
+    }
+
+    function back() {
+        window.history.go(-1);
+    }
+
+</script>

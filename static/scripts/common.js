@@ -1,5 +1,5 @@
 var common = {
-    serverUrl : "http://49.234.216.89/wz",
+    serverUrl : "http://localhost:8080/wz",
     indexPage : "http://49.234.216.89/index.html",
     loginPage : "http://49.234.216.89/login.html",
     url : {
@@ -11,7 +11,12 @@ var common = {
         getGenTypeList : "/genManager/getGenTypeList",
         getGenDataList : "/genManager/getGenDataList",
         insertGenData : "/genManager/insertGenData",
-        deleteGenData : "/genManager/deleteGenData"
+        deleteGenData : "/genManager/deleteGenData",
+        getFileList : "/file/list",
+
+        insertSysNavigationGroup : "/sysNavigationGroup/add",
+        listNavigationGroup : "/sysNavigationGroup/list",
+        deleteNavigationGroup : "/sysNavigationGroup/delete",
     },
 
     defaultType : [
@@ -73,7 +78,7 @@ var common = {
                     top.window.location.href = common.loginPage;
                 }
                 if (o.code == 500) {
-                    window.location.href = common.loginPage;
+                    alert("系统错误：" + o.message);
                 }
                 callback(o);
             }

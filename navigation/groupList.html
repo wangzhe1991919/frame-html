@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>导航分组列表</title>
+    <script src="../static/jquery/jquery-3.3.1.min.js"></script>
+    <script src="../static/scripts/common.js"></script>
+</head>
+<body>
+    <table id = "table">
+        <tr>
+            <td>名称</td>
+            <td>排序</td>
+            <td>操作</td>
+        </tr>
+    </table>
+
+</body>
+</html>
+<script>
+    common.ajaxObj($,common.url.listNavigationGroup,null,"POST",function(o){
+        if (o.code == 200) {
+            var data = o.data;
+            for (var i = 0; i < data.length; i++) {
+                $("#table").append("<tr><td>"+data[i].name+"</td><td>"+data[i].sort+"</td><td><a href=\"javascript:void(0);\" onclick=\"del("+data[i].id+")\">删除</a></td></tr>");
+            }
+        } else {
+            alert(o.message);
+        }
+    });
+
+    function del(id) {
+        alert(id);
+        common.ajaxDefault($,common.url.deleteNavigationGroup,{"id":id},"DELETE",function(o) {
+            alert(o.message);
+        })
+    }
+</script>
