@@ -1,5 +1,5 @@
 var common = {
-    serverUrl : "http://localhost:8080/wz",
+    serverUrl : "http://localhost:80",
     indexPage : "http://49.234.216.89/index.html",
     loginPage : "http://49.234.216.89/login.html",
     url : {
