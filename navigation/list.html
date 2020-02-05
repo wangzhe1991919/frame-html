@@ -3,8 +3,57 @@
 <head>
     <meta charset="UTF-8">
     <title>导航列表</title>
+    <script src="../static/jquery/jquery-3.3.1.min.js"></script>
+    <script src="../static/scripts/common.js"></script>
 </head>
 <body>
 
+    <table id = "table">
+        <tr>
+            <td>所属分组</td>
+            <td>名称</td>
+            <td>排序</td>
+            <td>图标</td>
+            <td>是否打开新窗口</td>
+            <td>备注</td>
+            <td>操作</td>
+        </tr>
+    </table>
+
+    <br/><hr>
+    <a href="edit.html">添加</a>
+
 </body>
+
 </html>
+<script>
+    common.ajaxObj($,common.url.listNavigation,null,"POST",function(o){
+        if (o.code == 200) {
+            const data = o.data;
+            for (let i = 0; i < data.length; i++) {
+                $("#table").append("<tr>" +
+                    "<td>"+data[i].groupId+"</td>" +
+                    "<td>"+data[i].name+"</td>" +
+                    "<td>"+data[i].sort +"</td>" +
+                    "<td>"+data[i].icon +"</td>" +
+                    "<td>"+data[i].opennew +"</td>" +
+                    "<td>"+data[i].remark +"</td>" +
+
+                    "<td><a href=\"javascript:void(0);\" onclick=\"edit('"+data[i].id+"')\">编辑</a> &nbsp;" +
+                    "<a href=\"javascript:void(0);\" onclick=\"del('"+data[i].id+"')\">删除</a></td></tr>");
+            }
+        }
+    });
+
+    function del(id) {
+        if (confirm("确实删除？")) {
+            common.ajaxDefault($,common.url.deleteNavigation,{"id":id},"DELETE",function(o) {
+                location.reload();
+            })
+        }
+    }
+
+    function edit(id) {
+        location.href="edit.html?id=" + id;
+    }
+</script>

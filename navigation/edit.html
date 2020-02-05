@@ -3,25 +3,90 @@
 <head>
     <meta charset="UTF-8">
     <title>导航编辑</title>
+    <script src="../static/jquery/jquery-3.3.1.min.js"></script>
     <script src="../static/scripts/common.js"></script>
 </head>
-<body>
+<body onload="init()">
     <div>
         <form>
-            所属分组：<input type="text"><br/>
-            名称*：<input type="text"><br/>
-            链接*：<input type="text"><br/>
-            排序*：<input type="number"><br/>
+            所属分组：<select id="group"></select><br/>
+            名称*：<input type="text" id="name" required="required"><br/>
+            链接*：<input type="text" id="url"><br/>
+            排序*：<input type="number" id="sort"><br/>
             是否打开新窗口-   是：<input type="radio" value="1"> 否：<input type="radio" value="0"><br/>
-            图标：<input type="file"><br/>
-            备注：<input type="text"><br/>
-            <input type="submit" value="提交">
+            <!--图标：<input type="file" id="icon"><br/>-->
+            备注：<input type="text" id="remark"><br/>
+            <input type="button" onclick="add()" value="提交">
+            <input type="button" onclick="back()" value="返回">
         </form>
     </div>
 
 </body>
 </html>
 <script>
+    const id = common.GetRequestParamValue("id");
     //初始化分组数据
+    function init() {
+        common.ajaxObj($,common.url.listNavigationGroup,null,"POST",function(o){
+            if (o.code == 200) {
+                const data = o.data;
+                for (let i = 0; i < data.length; i++) {
+                    $("#group").append("<option value=\""+data[i].id+"\">"+data[i].name+"</option>");
+                }
 
+                //加载数据
+                if (id != null) {
+                    common.ajaxDefault($,common.url.getSysNavigation,{"id":id},"GET",function(o){
+                        if (o.data) {
+                            $("#group").val(o.data.groupId);
+                            $("#name").val(o.data.name);
+                            $("#sort").val(o.data.sort);
+                            $("#url").val(o.data.url);
+                            $("#icon").val(o.data.icon);
+                            $("#remark").val(o.data.remark);
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+
+
+
+    function add() {
+        const groupId = $("#group option:selected").val();
+        const name = $("#name").val();
+        const sort = $("#sort").val();
+        const url = $("#url").val();
+        const remark = $("#remark").val();
+
+        if (!name || !sort || !url) {
+            alert("填写必填项");
+            return;
+        }
+
+        //构造表单参数
+        var paramObj = {
+            groupId : groupId,
+            name : name,
+            url : url,
+            remark : remark,
+            sort : sort
+        };
+
+        var ajaxUrl = common.url.insertSysNavigation;
+        if (id) {
+            paramObj.id = id;
+            //调用编辑接口
+            ajaxUrl = common.url.updateSysNavigation;
+        }
+        common.ajaxObj($,ajaxUrl,paramObj,"POST",function(o){
+            alert(o.message);
+        });
+    }
+
+    function back() {
+        window.history.go(-1);
+    }
 </script>

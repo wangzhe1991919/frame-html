@@ -19,6 +19,12 @@ var common = {
         updateSysNavigationGroup : "/sysNavigationGroup/update",
         listNavigationGroup : "/sysNavigationGroup/list",
         deleteNavigationGroup : "/sysNavigationGroup/delete",
+
+        getSysNavigation : "/sysNavigation/get",
+        insertSysNavigation : "/sysNavigation/add",
+        updateSysNavigation : "/sysNavigation/update",
+        listNavigation : "/sysNavigation/list",
+        deleteNavigation : "/sysNavigation/delete",
     },
 
     defaultType : [
