@@ -17,6 +17,17 @@
 </html>
 <script>
 
+    var id = common.GetRequestParamValue("id");
+    if (id != null) {
+        common.ajaxDefault($,common.url.getSysNavigationGroup,{"id":id},"GET",function(o){
+            if (o.data) {
+                $("#name").val(o.data.name);
+                $("#sort").val(o.data.sort);
+            }
+        });
+    }
+
+
     function add() {
         var name = $("#name").val();
         var sort = $("#sort").val();
@@ -24,13 +35,18 @@
             alert("都必填");
             return;
         }
-        common.ajaxObj($,common.url.insertSysNavigationGroup,{"name":name,"sort":sort},"POST",function(o){
-           if (o.code == 200) {
-               alert("添加成功");
-           } else {
-               alert(o.message);
-           }
-        });
+
+        if (id) {
+            //编辑
+            common.ajaxObj($,common.url.updateSysNavigationGroup,{"id":id,"name":name,"sort":sort},"POST",function(o){
+                alert(o.message);
+            });
+        } else {
+            //新增
+            common.ajaxObj($,common.url.insertSysNavigationGroup,{"name":name,"sort":sort},"POST",function(o){
+                alert(o.message);
+            });
+        }
     }
 
     function back() {

@@ -25,7 +25,9 @@
         if (o.code == 200) {
             var data = o.data;
             for (var i = 0; i < data.length; i++) {
-                $("#table").append("<tr><td>"+data[i].name+"</td><td>"+data[i].sort +"</td><td><a href=\"javascript:void(0);\" onclick=\"del('"+data[i].id+"')\">删除</a></td></tr>");
+                $("#table").append("<tr><td>"+data[i].name+"</td><td>"+data[i].sort +"</td><td>" +
+                    "<a href=\"javascript:void(0);\" onclick=\"edit('"+data[i].id+"')\">编辑</a> &nbsp;" +
+                    "<a href=\"javascript:void(0);\" onclick=\"del('"+data[i].id+"')\">删除</a></td></tr>");
             }
         } else {
             alert(o.message);
@@ -33,8 +35,14 @@
     });
 
     function del(id) {
-        common.ajaxDefault($,common.url.deleteNavigationGroup,{"id":id},"DELETE",function(o) {
-            location.reload();
-        })
+        if (confirm("确实删除？")) {
+            common.ajaxDefault($,common.url.deleteNavigationGroup,{"id":id},"DELETE",function(o) {
+                location.reload();
+            })
+        }
+    }
+
+    function edit(id) {
+        location.href="groupEdit.html?id=" + id;
     }
 </script>

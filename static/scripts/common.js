@@ -14,7 +14,9 @@ var common = {
         deleteGenData : "/genManager/deleteGenData",
         getFileList : "/file/list",
 
+        getSysNavigationGroup : "/sysNavigationGroup/get",
         insertSysNavigationGroup : "/sysNavigationGroup/add",
+        updateSysNavigationGroup : "/sysNavigationGroup/update",
         listNavigationGroup : "/sysNavigationGroup/list",
         deleteNavigationGroup : "/sysNavigationGroup/delete",
     },
@@ -78,7 +80,7 @@ var common = {
                     top.window.location.href = common.loginPage;
                 }
                 if (o.code == 500) {
-                    alert("系统错误：" + o.message);
+
                 }
                 callback(o);
             }
@@ -115,6 +117,23 @@ var common = {
             $("#" + domId).append("<option value=\"" + data[i].id + "\">" + data[i].name + "</option>");
             form.render("select");
         }
+    },
+
+
+    /**
+     * [通过参数名获取url中的参数值]
+     * 示例URL:http://htmlJsTest/getrequest.html?uid=admin&rid=1&fid=2&name=小明
+     * @param  {[string]} queryName [参数名]
+     * @return {[string]}           [参数值]
+     */
+    GetRequestParamValue : function (queryName) {
+        var query = decodeURI(window.location.search.substring(1));
+        var vars = query.split("&");
+        for (var i = 0; i < vars.length; i++) {
+            var pair = vars[i].split("=");
+            if (pair[0] === queryName) { return pair[1]; }
+        }
+        return null;
     }
 
-}
+};
