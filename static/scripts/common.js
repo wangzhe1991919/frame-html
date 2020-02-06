@@ -25,6 +25,7 @@ var common = {
         updateSysNavigation : "/sysNavigation/update",
         listNavigation : "/sysNavigation/list",
         deleteNavigation : "/sysNavigation/delete",
+        listNavigationIndex : "/sysNavigation/listIndex",
     },
 
     defaultType : [

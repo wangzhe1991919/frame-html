@@ -6,13 +6,23 @@
     <script src="../static/jquery/jquery-3.3.1.min.js"></script>
     <script src="../static/scripts/common.js"></script>
 </head>
+<style>
+    table{table-layout:fixed;word-break:break-all;text-align: center;}
+</style>
 <body>
+
+    <a href="edit.html">添加</a>
+
+    <a href="index.html">导航页</a>
+
+    <br/><hr>
 
     <table id = "table">
         <tr>
             <td>所属分组</td>
             <td>名称</td>
             <td>排序</td>
+            <td width="30%">链接地址</td>
             <td>图标</td>
             <td>是否打开新窗口</td>
             <td>备注</td>
@@ -20,8 +30,7 @@
         </tr>
     </table>
 
-    <br/><hr>
-    <a href="edit.html">添加</a>
+
 
 </body>
 
@@ -35,6 +44,7 @@
                     "<td>"+data[i].groupName+"</td>" +
                     "<td>"+data[i].name+"</td>" +
                     "<td>"+data[i].sort +"</td>" +
+                    "<td>"+data[i].url +"</td>" +
                     "<td>"+data[i].icon +"</td>" +
                     "<td>"+data[i].opennew +"</td>" +
                     "<td>"+data[i].remark +"</td>" +

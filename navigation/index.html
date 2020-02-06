@@ -2,9 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>导航</title>
+    <script src="../static/jquery/jquery-3.3.1.min.js"></script>
+    <script src="../static/scripts/common.js"></script>
 </head>
 <body>
 
+    <a href="groupList.html">导航分组管理</a>
+    &nbsp;
+    <a href="list.html">导航列表管理</a>
+    <hr>
+    <div id="mainDiv">
+
+    </div>
+
 </body>
 </html>
+<script>
+    common.ajaxObj($,common.url.listNavigationIndex,null,"POST",function(o){
+        if (o.code == 200) {
+            const data = o.data;
+            for (let i = 0; i < data.length; i++) {
+                $("#mainDiv").append("<hr>" + data[i].groupName + "<br>");
+                const navigation = data[i].navigationVOList;
+                for (let j = 0; j < navigation.length; j++) {
+                    $("#mainDiv").append("<a href='"+navigation[j].url+"'>" + navigation[j].name + "</a>&nbsp;");
+                }
+            }
+        }
+    });
+
+</script>
