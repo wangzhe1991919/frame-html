@@ -6,6 +6,18 @@
     <script src="../static/jquery/jquery-3.3.1.min.js"></script>
     <script src="../static/scripts/common.js"></script>
 </head>
+<style>
+    .groupDiv {height: 100px;}
+    .btnDiv{
+        float: left;
+        border: #00FF00 1px dashed;
+        width:15%;
+        height:60px;
+        text-align: center;
+        line-height: 60px;
+        margin: 5px;
+    }
+</style>
 <body>
 
     <a href="groupList.html">导航分组管理</a>
@@ -13,7 +25,16 @@
     <a href="list.html">导航列表管理</a>
     <hr>
     <div id="mainDiv">
+        <!--<div style="border: #0000FF solid 1px;height:150px;">
+            <div>asdasdasd</div>
+            <div class="btnDiv"> <a href="">bbbb</a></div>
+            <div class="btnDiv"> <a href="">ccc</a></div>
+        </div>
 
+        <div style="border: #ffff00 solid 1px;height:100px;">
+            <div>asdasdasd</div>
+            <div class="btnDiv"> <a href="">bbbb</a></div>
+        </div>-->
     </div>
 
 </body>
@@ -23,10 +44,10 @@
         if (o.code == 200) {
             const data = o.data;
             for (let i = 0; i < data.length; i++) {
-                $("#mainDiv").append("<hr>" + data[i].groupName + "<br>");
+                $("#mainDiv").append("<hr><div id='"+ data[i].groupId+"' class='groupDiv'><div>" + data[i].groupName + "</div>");
                 const navigation = data[i].navigationVOList;
                 for (let j = 0; j < navigation.length; j++) {
-                    $("#mainDiv").append("<a href='"+navigation[j].url+"'>" + navigation[j].name + "</a>&nbsp;");
+                    $("#" + data[i].groupId).append("<div class='btnDiv'><a href='"+navigation[j].url+"'>" + navigation[j].name + "</a></div></div>");
                 }
             }
         }
