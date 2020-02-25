@@ -1,6 +1,6 @@
 var common = {
-    serverUrl : "http://localhost:80",
-    indexPage : "http://49.234.216.89/index.html",
+    serverUrl : "http://49.234.216.89/wz",//部署应该是nginx的端口（部署前端应用的端口）
+    indexPage : "http://49.234.216.89/navigation/index.html",
     loginPage : "http://49.234.216.89/login.html",
     url : {
         login : "/sys/login",
@@ -25,7 +25,7 @@ var common = {
         updateSysNavigation : "/sysNavigation/update",
         listNavigation : "/sysNavigation/list",
         deleteNavigation : "/sysNavigation/delete",
-        listNavigationIndex : "/sysNavigation/listIndex",
+        listNavigationIndex : "/sysNavigation/listIndex"
     },
 
     defaultType : [

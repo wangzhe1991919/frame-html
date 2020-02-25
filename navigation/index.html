@@ -7,7 +7,6 @@
     <script src="../static/scripts/common.js"></script>
 </head>
 <style>
-    .groupDiv {height: 100px;}
     .btnDiv{
         float: left;
         border: #00FF00 1px dashed;
@@ -44,10 +43,13 @@
         if (o.code == 200) {
             const data = o.data;
             for (let i = 0; i < data.length; i++) {
-                $("#mainDiv").append("<hr><div id='"+ data[i].groupId+"' class='groupDiv'><div>" + data[i].groupName + "</div>");
                 const navigation = data[i].navigationVOList;
+                //向上取整
+                var height = Math.ceil(navigation.length/6) * 100;
+
+                $("#mainDiv").append("<hr><div id='"+ data[i].groupId+"' style='height:"+height+"px;'><div>" + data[i].groupName + "</div>");
                 for (let j = 0; j < navigation.length; j++) {
-                    $("#" + data[i].groupId).append("<div class='btnDiv'><a href='"+navigation[j].url+"'>" + navigation[j].name + "</a></div></div>");
+                    $("#" + data[i].groupId).append("<div class='btnDiv'><a target='_blank' href='"+navigation[j].url+"'>" + navigation[j].name + "</a></div></div>");
                 }
             }
         }
