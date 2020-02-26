@@ -26,6 +26,11 @@
     }
     .group-name{
         font-size: 20px;
+        color: #333333;
+        border-radius: 5px;
+        background-color: #8c8c8c;
+    }
+    .manage-div a{
         color: #F2F2F2;
     }
 </style>
@@ -60,9 +65,9 @@
                 const navigation = data[i].navigationVOList;
                 //向上取整
                 var height = Math.ceil(navigation.length/6) * 100;
-                $("#mainDiv").append("<hr>" +
+                $("#mainDiv").append("<br/>" +
                     "<div id='"+ data[i].groupId+"' style='height:"+height+"px;'>" +
-                    "   <div class='group-name'>" + data[i].groupName + "</div>");
+                    "   <div><span class='group-name'>" + data[i].groupName + "</span></div>");
                 for (let j = 0; j < navigation.length; j++) {
                     $("#" + data[i].groupId).append("" +
                         "<div class='btnDiv' data-url='"+navigation[j].url+"'>" + navigation[j].name + "</div>" +
