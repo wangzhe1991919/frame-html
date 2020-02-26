@@ -7,22 +7,36 @@
     <script src="../static/scripts/common.js"></script>
 </head>
 <style>
+    body{
+        background-color: #3F3F3F;
+    }
     .btnDiv{
         float: left;
-        border: #00FF00 1px dashed;
+        border: #F2F2F2 1px dashed;
         width:15%;
         height:60px;
         text-align: center;
         line-height: 60px;
         margin: 5px;
+        color: #F2F2F2;
+    }
+    .btnDiv:hover {
+        background-color: #8c8c8c;
+        cursor: pointer;
+    }
+    .group-name{
+        font-size: 20px;
+        color: #F2F2F2;
     }
 </style>
 <body>
 
-    <a href="groupList.html">导航分组管理</a>
-    &nbsp;
-    <a href="list.html">导航列表管理</a>
-    <hr>
+    <div class="manage-div">
+        <a href="groupList.html">导航分组管理</a>
+        &nbsp
+        <a href="list.html">导航列表管理</a>
+    </div>
+
     <div id="mainDiv">
         <!--<div style="border: #0000FF solid 1px;height:150px;">
             <div>asdasdasd</div>
@@ -46,13 +60,23 @@
                 const navigation = data[i].navigationVOList;
                 //向上取整
                 var height = Math.ceil(navigation.length/6) * 100;
-
-                $("#mainDiv").append("<hr><div id='"+ data[i].groupId+"' style='height:"+height+"px;'><div>" + data[i].groupName + "</div>");
+                $("#mainDiv").append("<hr>" +
+                    "<div id='"+ data[i].groupId+"' style='height:"+height+"px;'>" +
+                    "   <div class='group-name'>" + data[i].groupName + "</div>");
                 for (let j = 0; j < navigation.length; j++) {
-                    $("#" + data[i].groupId).append("<div class='btnDiv'><a target='_blank' href='"+navigation[j].url+"'>" + navigation[j].name + "</a></div></div>");
+                    $("#" + data[i].groupId).append("" +
+                        "<div class='btnDiv' data-url='"+navigation[j].url+"'>" + navigation[j].name + "</div>" +
+                    "</div>");
                 }
             }
+            $(".btnDiv").click(function(){
+                let url = this.dataset.url;
+                window.open(url);
+            });
         }
     });
 
+
+
+//<a target='_blank' href='"+navigation[j].url+"'>" + navigation[j].name + "</a>
 </script>
