@@ -25,7 +25,9 @@ var common = {
         updateSysNavigation : "/sysNavigation/update",
         listNavigation : "/sysNavigation/list",
         deleteNavigation : "/sysNavigation/delete",
-        listNavigationIndex : "/sysNavigation/listIndex"
+        listNavigationIndex : "/sysNavigation/listIndex",
+        insertNote : "/sysNavigation/addNote",
+        getNote : "/sysNavigation/getNote"
     },
 
     defaultType : [
@@ -87,7 +89,7 @@ var common = {
                     top.window.location.href = common.loginPage;
                 }
                 if (o.code == 500) {
-
+                    alert("请求500：" + o.message);
                 }
                 callback(o);
             }
