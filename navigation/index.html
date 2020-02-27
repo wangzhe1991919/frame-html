@@ -10,7 +10,7 @@
     body{
         background-color: #3F3F3F;
     }
-    .btnDiv{
+    .btn-div{
         float: left;
         border: #F2F2F2 1px dashed;
         width:15%;
@@ -20,7 +20,7 @@
         margin: 5px;
         color: #F2F2F2;
     }
-    .btnDiv:hover {
+    .btn-div:hover {
         background-color: #8c8c8c;
         cursor: pointer;
     }
@@ -29,9 +29,52 @@
         color: #333333;
         border-radius: 5px;
         background-color: #8c8c8c;
+        margin: 5px;
+        padding: 2px;
     }
     .manage-div a{
         color: #F2F2F2;
+    }
+
+    #navigation-div{
+        //border: 1px solid red;
+        width:70%;
+        float: left;
+    }
+    #note-div {
+        width: 29%;
+        //border: 1px solid yellow;
+        float: right;
+        height: 100%;
+    }
+     .note{
+        width: 98%;
+        overflow: auto;
+        height: 850px;
+        word-break: break-all;
+        background-color: #696969;
+        color: #f2f2f2;
+    }
+    #note-div button {
+        color: #F2F2F2;
+        width:100%;
+        height: 40px;
+        background-color: #4476A7;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    #note-div button:hover {
+        background-color: #2aabd2;
+        cursor: pointer;
+    }
+    #note-div span {
+        width:100%;
+        height: 40px;
+        magin-top:5px;
+    }
+    .msg {
+        color: #4cae4c;
     }
 </style>
 <body>
@@ -42,46 +85,62 @@
         <a href="list.html">导航列表管理</a>
     </div>
 
-    <div id="mainDiv">
-        <!--<div style="border: #0000FF solid 1px;height:150px;">
-            <div>asdasdasd</div>
-            <div class="btnDiv"> <a href="">bbbb</a></div>
-            <div class="btnDiv"> <a href="">ccc</a></div>
-        </div>
-
-        <div style="border: #ffff00 solid 1px;height:100px;">
-            <div>asdasdasd</div>
-            <div class="btnDiv"> <a href="">bbbb</a></div>
-        </div>-->
+    <div id="navigation-div"></div>
+    <div id="note-div">
+        <input type="hidden" id="note-id"/>
+        <textarea class="note"></textarea>
+        <button class="save-note">保存</button>
+        <span class="msg">提示区域</span>
     </div>
 
 </body>
 </html>
 <script>
+    //加载导航数据
     common.ajaxObj($,common.url.listNavigationIndex,null,"POST",function(o){
-        if (o.code == 200) {
-            const data = o.data;
-            for (let i = 0; i < data.length; i++) {
-                const navigation = data[i].navigationVOList;
-                //向上取整
-                var height = Math.ceil(navigation.length/6) * 100;
-                $("#mainDiv").append("<br/>" +
-                    "<div id='"+ data[i].groupId+"' style='height:"+height+"px;'>" +
-                    "   <div><span class='group-name'>" + data[i].groupName + "</span></div>");
-                for (let j = 0; j < navigation.length; j++) {
-                    $("#" + data[i].groupId).append("" +
-                        "<div class='btnDiv' data-url='"+navigation[j].url+"'>" + navigation[j].name + "</div>" +
-                    "</div>");
-                }
+        const data = o.data;
+        for (let i = 0; i < data.length; i++) {
+            const navigation = data[i].navigationVOList;
+            //向上取整
+            var height = Math.ceil(navigation.length/6) * 100;
+            $("#navigation-div").append("<br/>" +
+                "<div id='"+ data[i].groupId+"' style='height:"+height+"px;'>" +
+                "   <div><span class='group-name'>" + data[i].groupName + "</span></div>");
+            for (let j = 0; j < navigation.length; j++) {
+                $("#" + data[i].groupId).append("" +
+                    "<div class='btn-div' data-url='"+navigation[j].url+"'>" + navigation[j].name + "</div>" +
+                "</div>");
             }
-            $(".btnDiv").click(function(){
-                let url = this.dataset.url;
-                window.open(url);
-            });
         }
+        $(".btn-div").click(function(){
+            let url = this.dataset.url;
+            window.open(url);
+        });
     });
 
+    //加载笔记数据
+    common.ajaxObj($,common.url.getNote,null,"GET",function (o) {
+        const data = o.data;
+        $("#note-id").val(data.id);
+        $(".note").val(data.content);
+    })
+
+    //保存按钮添加事件
+    $(".save-note").click(saveNote);
+
+    //保存笔记
+    function saveNote() {
+        common.ajaxObj($,common.url.insertNote,{id:$("#note-id").val(),content:$(".note").val()},"POST",function (o) {
+            $(".msg").html("最近保存成功时间：" + o.data);
+        });
+    }
+
+    //根据浏览器高度设置笔记高度
+    window.onload(function () {
+
+        }
+    )
 
 
-//<a target='_blank' href='"+navigation[j].url+"'>" + navigation[j].name + "</a>
+
 </script>
