@@ -162,6 +162,6 @@
     //根据浏览器高度设置笔记高度
     window.onresize = setNoteheight;
 
-    //每5分钟检查一次笔记内容，不一致的话自动保存
-    setInterval("autoSaveNote()",5 * 60 * 1000);//1000为1秒钟
+    //每10秒检查一次笔记内容，不一致的话自动保存
+    setInterval("autoSaveNote()",10 * 1000);//1000为1秒钟
 </script>
