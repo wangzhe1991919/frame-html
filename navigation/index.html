@@ -50,7 +50,6 @@
      .note{
         width: 98%;
         overflow: auto;
-        height: 850px;
         word-break: break-all;
         background-color: #696969;
         color: #f2f2f2;
@@ -90,12 +89,15 @@
         <input type="hidden" id="note-id"/>
         <textarea class="note"></textarea>
         <button class="save-note">保存</button>
-        <span class="msg">提示区域</span>
+        <span class="msg"></span>
     </div>
 
 </body>
 </html>
 <script>
+
+    var noteStr = null;
+
     //加载导航数据
     common.ajaxObj($,common.url.listNavigationIndex,null,"POST",function(o){
         const data = o.data;
@@ -123,6 +125,7 @@
         const data = o.data;
         $("#note-id").val(data.id);
         $(".note").val(data.content);
+        noteStr = data.content;
     })
 
     //保存按钮添加事件
@@ -132,15 +135,33 @@
     function saveNote() {
         common.ajaxObj($,common.url.insertNote,{id:$("#note-id").val(),content:$(".note").val()},"POST",function (o) {
             $(".msg").html("最近保存成功时间：" + o.data);
+            noteStr = $(".note").val();
         });
     }
 
-    //根据浏览器高度设置笔记高度
-    window.onload(function () {
-
+    /**
+     * 自动存储笔记
+     */
+    function autoSaveNote() {
+        //现在最新的笔记内容
+        var currNoteStr = $(".note").val();
+        //和原有的笔记数据进行对比，如果不一致，则自动保存
+        if (noteStr != currNoteStr) {
+            saveNote();
         }
-    )
+    }
 
+    function setNoteheight() {
+        $(".note").height($(window).height() - 120);
+    }
 
+    window.onload = function (e) {
+        setNoteheight();
+    }
 
+    //根据浏览器高度设置笔记高度
+    window.onresize = setNoteheight;
+
+    //每5分钟检查一次笔记内容，不一致的话自动保存
+    setInterval("autoSaveNote()",5 * 60 * 1000);//1000为1秒钟
 </script>
