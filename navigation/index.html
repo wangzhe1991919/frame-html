@@ -87,7 +87,7 @@
     <div id="navigation-div"></div>
     <div id="note-div">
         <input type="hidden" id="note-id"/>
-        <textarea class="note"></textarea>
+        <textarea onblur="autoSaveNote()" class="note"></textarea>
         <button class="save-note">保存</button>
         <span class="msg"></span>
     </div>
@@ -162,6 +162,4 @@
     //根据浏览器高度设置笔记高度
     window.onresize = setNoteheight;
 
-    //每10秒检查一次笔记内容，不一致的话自动保存
-    setInterval("autoSaveNote()",10 * 1000);//1000为1秒钟
 </script>
