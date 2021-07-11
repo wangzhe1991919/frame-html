@@ -1,7 +1,7 @@
 var common = {
-    serverUrl : "http://47.101.47.106/wz",//部署应该是nginx的端口（部署前端应用的端口）
-    indexPage : "http://47.101.47.106/navigation/index.html",
-    loginPage : "http://47.101.47.106/login.html",
+    serverUrl : "http://" + window.location.host + "/wz",//部署应该是nginx的端口（部署前端应用的端口）
+    indexPage : "http://" + window.location.host + "/index.html",
+    loginPage : "http://" + window.location.host + "/login.html",
     url : {
         login : "/sys/login",
         getData : "/getData",
