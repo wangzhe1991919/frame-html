@@ -85,16 +85,59 @@
     .msg {
         color: #4cae4c;
     }
+
+    .img-babby {
+        width: 70px;
+        height: 70px;
+        border:2px solid #afd9ee;
+        border-radius:120px;
+        overflow:hidden;
+        margin-right: 40px;
+        float: left;
+        box-shadow: 8px 8px 8px black;
+    }
+    .img-babby img{
+        height: 100%;
+    }
+
+    .manage-div{
+        float: left;
+        height: 80px;
+        width: 70%;
+        /*border: #00FF00 1px solid;*/
+    }
+    .config-btn {
+        float: right;
+        margin: 10px 10px;
+        /*border: red 1px solid;*/
+    }
+    .config-btn a{
+        color: #5e5e5e;
+    }
+
+
+
 </style>
 <body>
 
     <div class="manage-div">
-        <a href="groupList.html">导航分组管理</a>
-        &nbsp
-        <a href="list.html">导航列表管理</a>
+        <div class="img-babby"><img src="http://47.101.47.106:8000/miaomiao/1.png"></div>
+        <div class="img-babby"><img src="http://47.101.47.106:8000/miaomiao/2.png"></div>
+        <div class="img-babby"><img src="http://47.101.47.106:8000/miaomiao/3.png"></div>
+        <div class="img-babby"><img src="http://47.101.47.106:8000/miaomiao/4.png"></div>
+        <div class="img-babby"><img src="http://47.101.47.106:8000/miaomiao/5.png"></div>
+        <div class="img-babby"><img src="http://47.101.47.106:8000/miaomiao/6.png"></div>
+        <div class="img-babby"><img src="http://47.101.47.106:8000/miaomiao/7.png"></div>
+        <div class="img-babby"><img src="http://47.101.47.106:8000/miaomiao/8.png"></div>
+
+        <div class="config-btn">
+            <a href="groupList.html">导航分组管理</a>
+            <br/><br/>
+            <a href="list.html">导航列表管理</a>
+        </div>
+
     </div>
 
-    <div id="navigation-div"></div>
     <div id="note-div">
         <input type="hidden" id="note-id"/>
         <textarea onblur="autoSaveNote()" class="note"></textarea>
@@ -102,6 +145,9 @@
         <button class="save-note-create">保存并新建</button>
         <span class="msg"></span>
     </div>
+
+    <div id="navigation-div"></div>
+
 
 </body>
 </html>
