@@ -102,35 +102,8 @@
 
     var noteStr = null;
 
-    //加载导航数据
-    common.ajaxObj($,common.url.listNavigationIndex,null,"POST",function(o){
-        const data = o.data;
-        for (let i = 0; i < data.length; i++) {
-            const navigation = data[i].navigationVOList;
-            //向上取整
-            var height = Math.ceil(navigation.length/6) * 100;
-            $("#navigation-div").append("<br/>" +
-                "<div id='"+ data[i].groupId+"' style='height:"+height+"px;'>" +
-                "   <div><span class='group-name'>" + data[i].groupName + "</span></div>");
-            for (let j = 0; j < navigation.length; j++) {
-                $("#" + data[i].groupId).append("" +
-                    "<div class='btn-div' data-url='"+navigation[j].url+"'>" + navigation[j].name + "</div>" +
-                "</div>");
-            }
-        }
-        $(".btn-div").click(function(){
-            let url = this.dataset.url;
-            window.open(url);
-        });
-    });
-
-    //加载笔记数据
-    common.ajaxObj($,common.url.getNote,null,"GET",function (o) {
-        const data = o.data;
-        $("#note-id").val(data.id);
-        $(".note").val(data.content);
-        noteStr = data.content;
-    })
+    initNavigationData();
+    initNoteData();
 
     //保存按钮添加事件
     $(".save-note").click(saveNote);
@@ -138,21 +111,53 @@
     //保存并新建按钮添加事件
     $(".save-note-create").click(saveNoteCreate);
 
+    //加载导航数据
+    function initNavigationData() {
+        common.ajaxObj($,common.url.listNavigationIndex,null,"POST",function(o){
+            const data = o.data;
+            for (let i = 0; i < data.length; i++) {
+                const navigation = data[i].navigationVOList;
+                //向上取整
+                var height = Math.ceil(navigation.length/6) * 100;
+                $("#navigation-div").append("<br/>" +
+                    "<div id='"+ data[i].groupId+"' style='height:"+height+"px;'>" +
+                    "   <div><span class='group-name'>" + data[i].groupName + "</span></div>");
+                for (let j = 0; j < navigation.length; j++) {
+                    $("#" + data[i].groupId).append("" +
+                        "<div class='btn-div' data-url='"+navigation[j].url+"'>" + navigation[j].name + "</div>" +
+                    "</div>");
+                }
+            }
+            $(".btn-div").click(function(){
+                let url = this.dataset.url;
+                window.open(url);
+            });
+        });
+    }
+
+    ////加载笔记数据
+    function initNoteData () {
+        common.ajaxObj($,common.url.getNote,null,"GET",function (o) {
+            const data = o.data;
+            $("#note-id").val(data.id);
+            $(".note").val(data.content);
+            noteStr = data.content;
+        })
+    }
+
     //保存笔记
     function saveNote(url) {
         common.ajaxObj($,common.url.insertNote,{id:$("#note-id").val(),content:$(".note").val()},"POST",function (o) {
             $(".msg").html("最近保存成功时间：" + o.data);
-            noteStr = $(".note").val();
+            initNoteData();
         });
     }
 
     //保存并新建笔记
     function saveNoteCreate() {
         common.ajaxObj($,common.url.insertNoteCreate,{id:$("#note-id").val(),content:$(".note").val()},"POST",function (o) {
-            $(".msg").html("最近保存成功时间：" + o.data);
-            $("#note-id").val(o.data.id);
-            $(".note").val(o.data.content);
-            noteStr = o.data.content;
+            $(".msg").html("保存并新建成功：" + o.data);
+            initNoteData();
         });
     }
 
