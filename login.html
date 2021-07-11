@@ -37,7 +37,7 @@
         font-size: 2em;
         margin: 0.67em 0;
     }
-    input{
+    .zhmm{
         width: 278px;
         height: 18px;
         margin-bottom: 10px;
@@ -94,10 +94,11 @@
 <body>
     <div id="login">
         <h1>.............</h1>
-        <form method="post">
-            <input type="text" required="required" id="username" placeholder="用户名"></input>
-            <input type="password" required="required" id="password" placeholder="密码"></input>
-            <button class="but" onclick="login()">登录</button>
+        <form>
+            <input class="zhmm" type="text" required="required" id="username" placeholder="用户名"></input>
+            <input class="zhmm" type="password" required="required" id="password" placeholder="密码"></input>
+            <!--<button class="but" onclick="login()">登录</button>-->
+            <input class="but" type="button" value="登录" onclick="login()">
         </form>
     </div>
 </body>

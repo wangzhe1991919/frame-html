@@ -1,6 +1,6 @@
 var common = {
     serverUrl : "http://" + window.location.host + "/wz",//部署应该是nginx的端口（部署前端应用的端口）
-    indexPage : "http://" + window.location.host + "/index.html",
+    indexPage : "http://" + window.location.host + "/navigation/index.html",
     loginPage : "http://" + window.location.host + "/login.html",
     url : {
         login : "/sys/login",
