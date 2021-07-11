@@ -72,6 +72,9 @@
         height: 40px;
         magin-top:5px;
     }
+    .save-note-create {
+        margin-top:5px;
+    }
     .msg {
         color: #4cae4c;
     }
@@ -89,6 +92,7 @@
         <input type="hidden" id="note-id"/>
         <textarea onblur="autoSaveNote()" class="note"></textarea>
         <button class="save-note">保存</button>
+        <button class="save-note-create">保存并新建</button>
         <span class="msg"></span>
     </div>
 
@@ -132,10 +136,20 @@
     $(".save-note").click(saveNote);
 
     //保存笔记
-    function saveNote() {
+    function saveNote(url) {
         common.ajaxObj($,common.url.insertNote,{id:$("#note-id").val(),content:$(".note").val()},"POST",function (o) {
             $(".msg").html("最近保存成功时间：" + o.data);
             noteStr = $(".note").val();
+        });
+    }
+
+    //保存并新建笔记
+    function saveNoteCreate() {
+        common.ajaxObj($,url==null?common.url.saveAndCreateNote:url,{id:$("#note-id").val(),content:$(".note").val()},"POST",function (o) {
+            $(".msg").html("最近保存成功时间：" + o.data);
+            $("#note-id").val(o.data.id);
+            $(".note").val(o.data.content);
+            noteStr = o.data.content;
         });
     }
 
@@ -152,7 +166,7 @@
     }
 
     function setNoteheight() {
-        $(".note").height($(window).height() - 120);
+        $(".note").height($(window).height() - 160);
     }
 
     window.onload = function (e) {

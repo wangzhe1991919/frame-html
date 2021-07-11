@@ -27,6 +27,7 @@ var common = {
         deleteNavigation : "/sysNavigation/delete",
         listNavigationIndex : "/sysNavigation/listIndex",
         insertNote : "/sysNavigation/addNote",
+        insertNoteCreate : "/sysNavigation/saveAndCreateNote",
         getNote : "/sysNavigation/getNote"
     },
 
