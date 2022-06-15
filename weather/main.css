@@ -52,27 +52,27 @@ body{
 /*时间的css*/
 #date{
 	text-align:center;
-	margin-top:30%;
-	font-size:24px;
+	margin-top:10%;
+	font-size:30px;
 }
 #ndate{
 	text-align:center;
 	margin-top:20px;
-	font-size:14px;
+	font-size:40px;
 }
 #time{
 	text-align:center;
 	margin-top:25px;
 	margin-left: 30px;
-	font-size:60px;
+	font-size:100px;
 }
 #week{
 	text-align:center;
 	margin-top:25px;
-	font-size:24px;
+	font-size:40px;
 }
 #seconds{
-    font-size:24px;
+    font-size:40px;
 }
 .min_br{
 	margin-top:8px;

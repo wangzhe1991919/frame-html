@@ -28,7 +28,9 @@ var common = {
         listNavigationIndex : "/sysNavigation/listIndex",
         insertNote : "/sysNavigation/addNote",
         insertNoteCreate : "/sysNavigation/saveAndCreateNote",
-        getNote : "/sysNavigation/getNote"
+        getNote : "/sysNavigation/getNote",
+
+        nlpHome : "/nlp/"
     },
 
     defaultType : [
