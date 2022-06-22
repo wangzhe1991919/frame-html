@@ -99,6 +99,8 @@
         if (initContent == null) {
             initContent = getContentFromEditor();
         } else if (initContent != getContentFromEditor()) {
+            //此处应该清除关键字的标黄-bug
+            //todo
             initContentHtml = getHtmlFromEditor();
         }
         setContentToEditor(initContentHtml);
@@ -131,7 +133,7 @@
                 }
             } else if (type === "newWordDiscover") {
                 for (let i = 0; i < resultData.length; i++) {
-                    $(".result").append( "<span class='resultEl'><div>" + resultData[i].text + "&nbsp;frequency：" + resultData[i].frequency + "&nbsp;aggregation:" + resultData[i].aggregation + "&nbsp;entropy:" + resultData[i].entropy + "</div></span>");
+                    $(".result").append( "<span class='resultEl'><div>" + resultData[i].text + "&emsp;&emsp;frequency：" + resultData[i].frequency + "&emsp;&emsp;aggregation:" + resultData[i].aggregation + "&emsp;&emsp;entropy:" + resultData[i].entropy + "</div></span>");
                     contentHtml = replaceKeyWord(contentHtml,resultData[i]);
                 }
             } else if (type === "keyword" || type === "phraseExtractor" || type==="urlRecognition") {
