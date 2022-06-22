@@ -90,9 +90,8 @@ var common = {
             success: function(o) {
                 if (o.code == 302) {
                     top.window.location.href = common.loginPage;
-                }
-                if (o.code == 500) {
-                    alert("请求500：" + o.message);
+                } else {
+                    alert("状态："+ o.code + ",信息：" + o.message);
                 }
                 callback(o);
             }
