@@ -30,7 +30,9 @@ var common = {
         insertNoteCreate : "/sysNavigation/saveAndCreateNote",
         getNote : "/sysNavigation/getNote",
 
-        nlpHome : "/nlp/"
+        nlpHome : "/nlp/",
+        nlpAnalyzeByModel: "/nlpModel/analyzeByModel",
+        nlpSetNature: "/nlpModel/setNature"
     },
 
     defaultType : [
@@ -90,10 +92,12 @@ var common = {
             success: function(o) {
                 if (o.code == 302) {
                     top.window.location.href = common.loginPage;
-                } else if (o != 200) {
+                } else if (o.code != 200) {
                     alert("状态："+ o.code + ",信息：" + o.message);
                 }
                 callback(o);
+            },error: function(o) {
+                alert(o.responseJSON.message);
             }
         });
     },

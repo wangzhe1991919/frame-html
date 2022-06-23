@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>nlpIndex</title>
+    <link rel="stylesheet" type="text/css" href="../static/css/jquery.mloading.css">
+    <script src="../static/jquery/jquery-3.3.1.min.js"></script>
+    <script src="../static/jquery/jquery.mloading.js"></script>
+    <script src="../static/scripts/common.js"></script>
+    <script src="../static/scripts/tinymce/tinymce.min.js"></script>
+
+</head>
+<style>
+   .contentText{width: 100%;height: 300px;}
+   .result{width: 100%;height: 400px; border: solid 1px rebeccapurple;}
+   .sizeInput{width: 50px;}
+   .buttons button{margin-left: 30px;}
+   .resultEl {margin-left: 30px;}
+</style>
+<body>
+<div>
+    <div class="textareaDiv">
+        <textarea id="contentTextarea" class="contentText" placeholder="请输入需要解析的文本"></textarea>
+    </div>
+    <div class="buttons">
+        <table cellpadding="5px">
+            <tr>
+                <td><button onclick="submit('nlpSegment')">NLP分词</button></td>
+                <td><button onclick="submit('segment')">标准分词</button></td>
+                <td><button onclick="submit('crfLexicalAnalyzer')">CRF词法分析器</button></td>
+                <td><button onclick="submit('highSpeedSegment')">极速分词</button></td>
+                <td><button onclick="submit('orgOrPlaceRecognition')">机构名识别和地名识别</button></td>
+            </tr>
+            <tr>
+                <td><button onclick="submit('urlRecognition')">URL识别</button></td>
+                <td><button onclick="submit('keyword')">关键词提取</button>&nbsp;数量：<input id="keyword" class="sizeInput" type="number" value="10"></td>
+                <td><button onclick="submit('newWordDiscover')">词语提取、新词发现</button>&nbsp;数量：<input id="newWordDiscover" class="sizeInput" type="number" value="10"></td>
+                <td><button onclick="submit('phraseExtractor')">短语提取</button>&nbsp;数量：<input id="phraseExtractor" class="sizeInput" type="number" value="10"></td>
+                <td><button onclick="submit('summary')">自动摘要</button>&nbsp;数量：<input id="summary" class="sizeInput" type="number" value="10"></td>
+            </tr>
+        </table>
+    </div>
+    结果：
+    <div class="result">
+    </div>
+</div>
+</body>
+</html>
+<script>
+    //原始富文本输入框html内容
+    let initContentHtml = null;
+    //原始输入框的纯内容
+    let initContent = null;
+
+    tinymce.init({
+        selector: '#contentTextarea',
+        menubar: false
+    });
+
+    /**
+     * 获取富文本框中的内容（纯内容）
+     * @returns
+     */
+    function getContentFromEditor() {
+        let activeEditor = tinymce.activeEditor;
+        let editBody = activeEditor.getBody();
+        activeEditor.selection.select(editBody);
+        let text = activeEditor.selection.getContent({format : 'text' });
+        return text;
+    }
+    /**
+     * 获取富文本框中的内容（带html格式）
+     */
+    function getHtmlFromEditor() {
+        return tinymce.activeEditor.getContent();
+    }
+
+    /**
+     * 设置带格式的数据到富文本编辑器中
+     * @param content
+     */
+    function setContentToEditor(content) {
+        tinymce.activeEditor.insertContent(content);
+    }
+
+    /**
+     * 将检索出的关键字标颜色
+     */
+    function replaceKeyWord(content,keyword) {
+        content = content.replaceAll(keyword,"<span style='background-color: yellow;'>" + keyword + "</span>");
+        return content;
+    }
+
+    ////重置富文本框内容
+    function resetInitContent() {
+        if (initContentHtml == null) {
+            initContentHtml = getHtmlFromEditor();
+        }
+        if (initContent == null) {
+            initContent = getContentFromEditor();
+        } else if (initContent != getContentFromEditor()) {
+            //此处应该清除关键字的标黄-bug
+            //todo
+            initContentHtml = getHtmlFromEditor();
+        }
+        setContentToEditor(initContentHtml);
+    }
+    /**
+     * 解析文字
+     * @param type
+     */
+    function submit(type) {
+        //重置富文本框内容及格式
+        resetInitContent();
+        //纯文字
+        let content = getContentFromEditor();
+        //带html格式的文本
+        let contentHtml = getHtmlFromEditor();
+
+        //构造参数
+        let paraObj = {"content" : content};
+        let size = $("#" + type).val();
+        if (size) {paraObj.size = size}
+        //设置遮罩层
+        $("body").mLoading("show");
+        common.ajaxDefault($,common.url.nlpHome + type,paraObj,"POST",function(o) {
+            $(".resultEl").remove();
+            $("body").mLoading("hide");
+            let resultData = o.data;
+            if (type === "highSpeedSegment") {
+                for (let i = 0; i < resultData.length; i++) {
+                    $(".result").append("<span class='resultEl'><a href='#'>" + resultData[i].word + "</a>(频率：" + resultData[i].frequency + ")</span>");
+                }
+            } else if (type === "newWordDiscover") {
+                for (let i = 0; i < resultData.length; i++) {
+                    $(".result").append( "<span class='resultEl'><div>" + resultData[i].text + "&emsp;&emsp;frequency：" + resultData[i].frequency + "&emsp;&emsp;aggregation:" + resultData[i].aggregation + "&emsp;&emsp;entropy:" + resultData[i].entropy + "</div></span>");
+                    contentHtml = replaceKeyWord(contentHtml,resultData[i]);
+                }
+            } else if (type === "keyword" || type === "phraseExtractor" || type==="urlRecognition") {
+                //返回的是[String]格式的数据
+                for (let i = 0; i < resultData.length; i++) {
+                    $(".result").append( "<span class='resultEl'><a href='#'>" + resultData[i] + "</a></span>");
+                    contentHtml = replaceKeyWord(contentHtml,resultData[i]);
+                }
+            } else if (type === "summary") {
+                //返回的是[String]格式的数据,但一行比较长
+                for (let i = 0; i < resultData.length; i++) {
+                    $(".result").append( "<span class='resultEl'><div>" + resultData[i] + "</div></span>");
+                    contentHtml = replaceKeyWord(contentHtml,resultData[i]);
+                }
+            } else {
+                //返回的是{"value":"","label":""}格式的数据
+                if (type === "crfLexicalAnalyzer") {
+                    resultData = o.data.wordList;
+                }
+                for (let i = 0; i < resultData.length; i++) {
+                    $(".result").append( "<span class='resultEl'><a href='#'>" + resultData[i].value + "</a>(" + resultData[i].label + ")" + "</span>");
+                }
+            }
+            //将关键字标了底色后放到富文本编辑器中
+            setContentToEditor(contentHtml);
+        });
+    }
+</script>

@@ -11,37 +11,37 @@
 
 </head>
 <style>
-   .contentText{width: 100%;height: 300px;}
-   .result{width: 100%;height: 400px; border: solid 1px rebeccapurple;}
-   .sizeInput{width: 50px;}
+   .result{width: 100%;height: 200px;}
+   .modelInput{width: 50px;}
    .buttons button{margin-left: 30px;}
-   .resultEl {margin-left: 30px;}
+   #resultTextarea {width: 100%;height: 100%;}
 </style>
 <body>
 <div>
     <div class="textareaDiv">
-        <textarea id="contentTextarea" class="contentText" placeholder="请输入需要解析的文本"></textarea>
+        <textarea id="contentTextarea" placeholder="请输入需要解析的文本"></textarea>
     </div>
     <div class="buttons">
         <table cellpadding="5px">
             <tr>
-                <td><button onclick="submit('nlpSegment')">NLP分词</button></td>
-                <td><button onclick="submit('segment')">标准分词</button></td>
-                <td><button onclick="submit('crfLexicalAnalyzer')">CRF词法分析器</button></td>
-                <td><button onclick="submit('highSpeedSegment')">极速分词</button></td>
-                <td><button onclick="submit('orgOrPlaceRecognition')">机构名识别和地名识别</button></td>
-            </tr>
-            <tr>
-                <td><button onclick="submit('urlRecognition')">URL识别</button></td>
-                <td><button onclick="submit('keyword')">关键词提取</button>&nbsp;数量：<input id="keyword" class="sizeInput" type="number" value="10"></td>
-                <td><button onclick="submit('newWordDiscover')">词语提取、新词发现</button>&nbsp;数量：<input id="newWordDiscover" class="sizeInput" type="number" value="10"></td>
-                <td><button onclick="submit('phraseExtractor')">短语提取</button>&nbsp;数量：<input id="phraseExtractor" class="sizeInput" type="number" value="10"></td>
-                <td><button onclick="submit('summary')">自动摘要</button>&nbsp;数量：<input id="summary" class="sizeInput" type="number" value="10"></td>
+                <td>
+                    所属模型：<input class="modelInput" value="default" />
+                    <button onclick="">切换模型</button>
+                    <button onclick="">持久化模型</button>
+                </td>
+                <td>
+                    <button onclick="">学习</button>
+                    <button onclick="setNature()">词性标注</button>
+                </td>
+                <td>
+                    <button onclick="analyzeByModel()">分词</button>结果是否包含词性：<input type="checkbox" id="contailNature">
+                </td>
             </tr>
         </table>
     </div>
     结果：
     <div class="result">
+        <textarea id="resultTextarea" placeholder="分词结果"></textarea>
     </div>
 </div>
 </body>
@@ -54,6 +54,7 @@
 
     tinymce.init({
         selector: '#contentTextarea',
+        height: '250px',
         menubar: false
     });
 
@@ -84,14 +85,15 @@
     }
 
     /**
-     * 将检索出的关键字标颜色
+     * 给文字上颜色
      */
-    function replaceKeyWord(content,keyword) {
-        content = content.replaceAll(keyword,"<span style='background-color: yellow;'>" + keyword + "</span>");
-        return content;
+    function colorWord(keyword,color) {
+        if (!color) {color="yellow"}
+        return "<span style='background-color: "+ color +";'>" + keyword + "</span>";
     }
 
-    ////重置富文本框内容
+
+    //重置富文本框内容
     function resetInitContent() {
         if (initContentHtml == null) {
             initContentHtml = getHtmlFromEditor();
@@ -106,59 +108,52 @@
         setContentToEditor(initContentHtml);
     }
     /**
-     * 解析文字
+     * NLP分词
      * @param type
      */
-    function submit(type) {
-        //重置富文本框内容及格式
-        resetInitContent();
+    function analyzeByModel(type) {
         //纯文字
         let content = getContentFromEditor();
-        //带html格式的文本
-        let contentHtml = getHtmlFromEditor();
-
+        let contentHtml = "";
+        //是否包含词性
+        let withNature = $("#contailNature").is(':checked')
         //构造参数
-        let paraObj = {"content" : content};
-        let size = $("#" + type).val();
-        if (size) {paraObj.size = size}
+        let paraObj = {"content" : content,"nature" : withNature };
         //设置遮罩层
         $("body").mLoading("show");
-        common.ajaxDefault($,common.url.nlpHome + type,paraObj,"POST",function(o) {
+        common.ajaxDefault($,common.url.nlpAnalyzeByModel,paraObj,"GET",function(o) {
             $(".resultEl").remove();
             $("body").mLoading("hide");
             let resultData = o.data;
-            if (type === "highSpeedSegment") {
-                for (let i = 0; i < resultData.length; i++) {
-                    $(".result").append("<span class='resultEl'><a href='#'>" + resultData[i].word + "</a>(频率：" + resultData[i].frequency + ")</span>");
+            //结果textarea的数据
+            let resultText = "";
+            for (let i = 0; i < resultData.length; i++) {
+                resultText += (resultData[i] + " ");
+                let color = "";
+                if (i%2 == 1) {
+                    color = "#b2dba1";
+                } else {
+                    color = "#ffcc00";
                 }
-            } else if (type === "newWordDiscover") {
-                for (let i = 0; i < resultData.length; i++) {
-                    $(".result").append( "<span class='resultEl'><div>" + resultData[i].text + "&emsp;&emsp;frequency：" + resultData[i].frequency + "&emsp;&emsp;aggregation:" + resultData[i].aggregation + "&emsp;&emsp;entropy:" + resultData[i].entropy + "</div></span>");
-                    contentHtml = replaceKeyWord(contentHtml,resultData[i]);
-                }
-            } else if (type === "keyword" || type === "phraseExtractor" || type==="urlRecognition") {
-                //返回的是[String]格式的数据
-                for (let i = 0; i < resultData.length; i++) {
-                    $(".result").append( "<span class='resultEl'><a href='#'>" + resultData[i] + "</a></span>");
-                    contentHtml = replaceKeyWord(contentHtml,resultData[i]);
-                }
-            } else if (type === "summary") {
-                //返回的是[String]格式的数据,但一行比较长
-                for (let i = 0; i < resultData.length; i++) {
-                    $(".result").append( "<span class='resultEl'><div>" + resultData[i] + "</div></span>");
-                    contentHtml = replaceKeyWord(contentHtml,resultData[i]);
-                }
-            } else {
-                //返回的是{"value":"","label":""}格式的数据
-                if (type === "crfLexicalAnalyzer") {
-                    resultData = o.data.wordList;
-                }
-                for (let i = 0; i < resultData.length; i++) {
-                    $(".result").append( "<span class='resultEl'><a href='#'>" + resultData[i].value + "</a>(" + resultData[i].label + ")" + "</span>");
+                if (withNature) {
+                    contentHtml += colorWord(resultData[i].split("/")[0],color);
+                } else {
+                    contentHtml += colorWord(resultData[i],color);
                 }
             }
+            $("#resultTextarea").text(resultText);
             //将关键字标了底色后放到富文本编辑器中
             setContentToEditor(contentHtml);
+        });
+    }
+
+    /**
+     * 当分词结果不包含词性时，或者手动输入词性时，使用该方法可以自动标注词性
+     */
+    function setNature() {
+        let content =  $("#resultTextarea").text();
+        common.ajaxDefault($,common.url.nlpSetNature, {"content":content},"POST",function(o) {
+            $("#resultTextarea").text(o.data);
         });
     }
 </script>
