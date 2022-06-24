@@ -32,6 +32,9 @@ var common = {
 
         nlpHome : "/nlp/",
         nlpAnalyzeByModel: "/nlpModel/analyzeByModel",
+        nlpLearnOnline: "/nlpModel/learnOnline",
+        nlpTrainModel: "/nlpModel/trainModel",
+        nlpChangeModel: "/nlpModel/changeModelByName",
         nlpSetNature: "/nlpModel/setNature"
     },
 
@@ -83,6 +86,7 @@ var common = {
             contentType = "application/json;charset=utf-8";
             param = JSON.stringify(param);
         }
+        $("body").mLoading("show");
         $.ajax({
             type: type,
             url: common.serverUrl + url,
@@ -90,6 +94,7 @@ var common = {
             contentType: contentType,
             dataType: 'json',
             success: function(o) {
+                $("body").mLoading("hide");
                 if (o.code == 302) {
                     top.window.location.href = common.loginPage;
                 } else if (o.code != 200) {
@@ -97,6 +102,7 @@ var common = {
                 }
                 callback(o);
             },error: function(o) {
+                $("body").mLoading("hide");
                 alert(o.responseJSON.message);
             }
         });
@@ -133,7 +139,6 @@ var common = {
             form.render("select");
         }
     },
-
 
     /**
      * [通过参数名获取url中的参数值]
