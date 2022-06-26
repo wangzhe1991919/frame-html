@@ -35,6 +35,7 @@ var common = {
         nlpLearnOnline: "/nlpModel/learnOnline",
         nlpTrainModel: "/nlpModel/trainModel",
         nlpChangeModel: "/nlpModel/changeModelByName",
+        nlpGetNatureDict: "/nlpModel/getNatureDict",
         nlpSetNature: "/nlpModel/setNature"
     },
 
@@ -99,8 +100,9 @@ var common = {
                     top.window.location.href = common.loginPage;
                 } else if (o.code != 200) {
                     alert("状态："+ o.code + ",信息：" + o.message);
+                } else {
+                    callback(o);
                 }
-                callback(o);
             },error: function(o) {
                 $("body").mLoading("hide");
                 alert(o.responseJSON.message);

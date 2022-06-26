@@ -10,53 +10,82 @@
     <script src="../static/scripts/tinymce/tinymce.min.js"></script>
 </head>
 <style>
-   .result{width: 100%;height: 200px;}
+   .result{width: 100%;height: 150px;}
    .modelInput{width: 50px;}
    .buttons button{margin-left: 30px;}
    #resultTextarea {width: 100%;height: 100%;}
+   #anaResult {width: 100%;height: 100%;}
    .color-red {color: red;}
+   .bgYellow {background-color: yellow;}
+   a {text-decoration-line: none;}
 </style>
 <body>
-<div>
+<div style="float: left;width: 68%;">
     <div class="textareaDiv">
-        <textarea id="contentTextarea" placeholder="请输入需要解析的文本"></textarea>
+        <textarea id="contentTextarea" placeholder="请输入需要解析的文本，建议先从500字以内的一个段落开始"></textarea>
     </div>
     <div class="buttons">
         <table cellpadding="5px">
             <tr>
                 <td>
-                    所属模型：<input class="modelInput" id="modelInput" value="default" />
-                    <button onclick="changeModel()">切换模型</button>
-                    <button onclick="trainModel()">持久化模型</button>
-                </td>
-                <td>
-                    <button onclick="learnOnline()">训练</button>
-                    <button onclick="setNature()">词性标注</button>
+                    当前模型：<input class="modelInput" id="modelInput" value="default" />
+                    <!--<button onclick="changeModel()">切换模型</button>-->
                 </td>
                 <td>
                     <button onclick="analyzeByModel()">分词</button>
-                    结果是否包含词性：<input type="checkbox" id="contailNature" checked>
+                    <a href="javascript:void(0)" onclick="explain('analyze')">（功能解释）</a>
                 </td>
             </tr>
         </table>
     </div>
-    分词结果 & 训练语料:<span class="color-red">（学习时使用的是该文本框里的语料）</span>
+    分词结果：
     <div class="result">
-        <textarea id="resultTextarea" placeholder="分词结果"></textarea>
+        <textarea id="anaResult" placeholder="分词结果"></textarea>
     </div>
+    <br/>
+    <table cellpadding="5px">
+        <tr>
+            <td>
+                <button onclick="learnOnline()">训练</button>
+                <a href="javascript:void(0)" onclick="explain('learnOnline')">（功能解释）</a>
+            </td>
+            <td>
+                <button onclick="setNature()">词性标注</button>
+                <a href="javascript:void(0)" onclick="explain('setNature')">（功能解释）</a>
+            </td>
+            <td>
+                <button onclick="trainModel()">持久化模型</button>
+                <a href="javascript:void(0)" onclick="explain('trainModel')">（功能解释）</a>
+            </td>
+        </tr>
+    </table>
+    训练语料:<span class="color-red">（训练时使用的是该文本框里的语料）</span>
+    <div class="result">
+        <textarea id="resultTextarea" placeholder="训练使用语料"></textarea>
+    </div>
+</div>
+<span style="font-size: 20px;margin:10px;">词性参考：</span><br/>
+<div id="natureDiv" style="float:left;margin-left: 10px;width: 28%;height: 500px; border: #5FB878 1px dashed; border-radius: 10px;overflow: auto;">
+    <table id = "natureTable"></table>
 </div>
 </body>
 </html>
 <script>
-    //原始富文本输入框html内容
-    let initContentHtml = null;
-    //原始输入框的纯内容
-    let initContent = null;
 
     tinymce.init({
         selector: '#contentTextarea',
         height: '250px',
         menubar: false
+    });
+
+    $(document).ready(function(){
+        //加载词性提示
+        getNatureDict();
+        //看看url是否带着模型名称，如果带着，则自动加载到模型数据框内
+        let modelPara = common.GetRequestParamValue("model");
+        if (modelPara) {
+            $("#modelInput").val(modelPara);
+        }
     });
 
     /**
@@ -93,36 +122,19 @@
         return "<span style='background-color: "+ color +";'>" + keyword + "</span>";
     }
 
-    //重置富文本框内容
-    function resetInitContent() {
-        if (initContentHtml == null) {
-            initContentHtml = getHtmlFromEditor();
-        }
-        if (initContent == null) {
-            initContent = getContentFromEditor();
-        } else if (initContent != getContentFromEditor()) {
-            //此处应该清除关键字的标黄-bug
-            //todo
-            initContentHtml = getHtmlFromEditor();
-        }
-        setContentToEditor(initContentHtml);
-    }
     /**
-     * NLP分词
+     * NLP分词-语料训练框
      * @param type
      */
     function analyzeByModel(type) {
         //纯文字
         let content = getContentFromEditor();
+        let model = $("#modelInput").val();
         let contentHtml = "";
-        //是否包含词性
-        let withNature = $("#contailNature").is(':checked')
-        //构造参数
-        let paraObj = {"content" : content,"nature" : withNature };
         //设置遮罩层
-        common.ajaxDefault($,common.url.nlpAnalyzeByModel,paraObj,"GET",function(o) {
-            let resultData = o.data;
-            //结果textarea的数据
+        common.ajaxDefault($,common.url.nlpAnalyzeByModel,{"content" : content,"model": model},"GET",function(o) {
+            let resultData = o.data.corpusList;
+            //训练语料textarea的数据
             let resultText = "";
             for (let i = 0; i < resultData.length; i++) {
                 resultText += (resultData[i] + " ");
@@ -132,16 +144,26 @@
                 } else {
                     color = "#ffcc00";
                 }
-                if (withNature) {
-                    let noNature = resultData[i].split("/")[0].replaceAll("[","");
-                    contentHtml += colorWord(noNature,color);
-                } else {
-                    contentHtml += colorWord(resultData[i],color);
-                }
+                let noNature = resultData[i].split("/")[0].replaceAll("[","");
+                contentHtml += colorWord(noNature,color);
             }
             $("#resultTextarea").val(resultText);
             //将关键字标了底色后放到富文本编辑器中
             setContentToEditor(contentHtml);
+            //---------------------------------------------
+            //分词结果内容
+            let singleWordList = o.data.resultSingleList;
+            let singleWordText = "【单个词：---】";
+            for (let i = 0; i < singleWordList.length; i++) {
+                singleWordText += (singleWordList[i] + " ");
+            }
+            //分词复合词结果
+            let resultCompoundList = o.data.resultCompoundList;
+            let resultCompoundText = "【复合词：---】";
+            for (let i = 0; i < resultCompoundList.length; i++) {
+                resultCompoundText += resultCompoundList[i];
+            }
+            $("#anaResult").val(singleWordText + "\r\n\r\n" + resultCompoundText);
         });
     }
 
@@ -150,7 +172,8 @@
      */
     function setNature() {
         let content =  document.getElementById("resultTextarea").value;
-        common.ajaxDefault($,common.url.nlpSetNature, {"content":content},"POST",function(o) {
+        let model = $("#modelInput").val();
+        common.ajaxDefault($,common.url.nlpSetNature, {"content":content,"model":model},"POST",function(o) {
             $("#resultTextarea").val(o.data);
         });
     }
@@ -185,4 +208,67 @@
             alert("成功！");
         });
     }
+
+    /**
+     * 获取词性
+     */
+    function getNatureDict() {
+        common.ajaxDefault($,common.url.nlpGetNatureDict, null,"GET",function(o) {
+            let result = o.data;
+            for (let i = 0; i < result.length; i++) {
+                if (i == 0 || i%3==0) {
+                    $("#natureTable").append("<tr>");
+                }
+                let v = result[i].value;
+                if (v.length == 1) {
+                    v+= "  ";
+                } else if (v.length == 2) {
+                    v+= " ";
+                }
+                v = "<span class='bgYellow'>" + v + "</span>";
+                $("#natureTable").append("<td>" + v + "(<a href='#'>" + result[i].name + "</a>)</td>");
+                if (i == 0 || i%3==0) {
+                    $("#natureTable").append("</tr>");
+                }
+            }
+        });
+    }
+    function explain(btn) {
+        if (btn === "analyze") {
+            //分词按钮
+            alert("1.在上面的文本输入需要分析的内容（这是富文本框，最好别粘图片视频等）\r\n\r\n" +
+                "2.点击分词后，在下面的第一个文本框中会出现分词结果，结果包含单个词和复合词\r\n\r\n" +
+                "3.在下面的第二个文本框中会出现分词的结果和词性，可以修改部分词语和词性后直接进行训练\r\n");
+        } else if (btn === "learnOnline") {
+            //训练
+            alert("1.在训练语料文本框内输入要训练的语料，点击训练，即可在线训练，内容需遵循以下规则：\r\n\r\n" +
+                "●规范1：单词与词性之间使用/分割，如华尔街/nsf，且任何单词都必须有词性，包括标点等。\r\n" +
+                "●规范2：单词与单词之间使用空格分割，如美国/nsf 华尔街/nsf 股市/n。\r\n" +
+                "●规范3：支持用[]将多个单词合并为一个复合词，如[纽约/nsf 时报/n]/nz，复合词也必须遵守1和2两点规范。\r\n\r\n" +
+                "提示: 单次的训练并不一定会影响分词结果，请多训练一些语料后在看效果！");
+        } else if (btn === "setNature") {
+            //词性标注
+            alert("1.该功能是为了方便标注词性用的，可以直接将分词结果的文本框内的单个词结果复制过来，自动进行词性标注\r\n\r\n" +
+                "2.自动标注的词性是依赖当前模型的，并不一定全部符合你的要求，需要手动修改及标注你感兴趣的复合词\r\n\r\n" +
+                "●规范：每个词之间使用单个英文空格分割，如：我 和 特朗普 通 电话");
+        } else if (btn === "trainModel") {
+            //持久化模型
+            //2.
+            alert("1.在线训练结果不会永久保存，停止服务后训练结果会消失，如果想保存请点击持久化模型（增量）\r\n\r\n" +
+                "2.持久化模型后，实际上是更新当前模型对应的3个bin文件\r\n\r\n");
+        }
+    }
+
+
+    //重新设置高度
+    function resize() {
+        $("#natureDiv").height($(window).height() - 50);
+        $(".result").height($(window).height()/2 - 210);
+    }
+    window.onload = function (e) {
+        resize();
+    }
+    //根据浏览器高度设置笔记高度
+    window.onresize = resize;
+
 </script>
