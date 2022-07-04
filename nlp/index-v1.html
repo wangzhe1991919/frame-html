@@ -99,8 +99,6 @@
         if (initContent == null) {
             initContent = getContentFromEditor();
         } else if (initContent != getContentFromEditor()) {
-            //此处应该清除关键字的标黄-bug
-            //todo
             initContentHtml = getHtmlFromEditor();
         }
         setContentToEditor(initContentHtml);

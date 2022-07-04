@@ -36,7 +36,12 @@ var common = {
         nlpTrainModel: "/nlpModel/trainModel",
         nlpChangeModel: "/nlpModel/changeModelByName",
         nlpGetNatureDict: "/nlpModel/getNatureDict",
-        nlpSetNature: "/nlpModel/setNature"
+        nlpSetNature: "/nlpModel/setNature",
+
+        nlpSaveCustomWord: "/nlpModel/saveWord",
+        nlpGetNature: "/nlpModel/getNature",
+        nlpDelWord: "/nlpModel/delWord",
+        nlpGetWordList: "/nlpModel/getWordList"
     },
 
     defaultType : [

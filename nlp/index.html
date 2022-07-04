@@ -64,10 +64,33 @@
         <textarea id="resultTextarea" placeholder="训练使用语料"></textarea>
     </div>
 </div>
-<span style="font-size: 20px;margin:10px;">词性参考：</span><br/>
-<div id="natureDiv" style="float:left;margin-left: 10px;width: 28%;height: 500px; border: #5FB878 1px dashed; border-radius: 10px;overflow: auto;">
-    <table id = "natureTable"></table>
+
+<div id="natureDiv" style="float:left;margin-left: 10px;width: 28%;height: 300px; border: #5FB878 1px dashed; border-radius: 10px;">
+    <div style="width: 100%;height: 100%;overflow: auto;">
+        <span style="font-size: 20px;margin:10px;">词性参考：</span><br/>
+        <table id = "natureTable"></table>
+    </div>
+    <div style="width: 100%;height: 320px;border: 1px red solid; margin-top:5px;">
+
+        <div style="float: left; width: 40%;border: yellow 1px solid;">
+            自定义词(15字内)：<br/><input id="custom_word"><br/>
+            词性(可点击分析词性自动获取)：<br/><input id="custom_nature" style="width: 30%;"><span id="custom_nature_cn" class="bgYellow"></span><br/>
+            词频(1-100)：<br/><input id="custom_frequency" value="50"><br/>
+            类型(自定义)<br/>：<input id="custom_type"><br/>
+            <button onclick="saveCustomWord()">保存</button>
+            <button onclick="getNature()">分析词性</button>
+        </div>
+        <div>
+            自定义词列表：
+            <table id = "custom_word_table" border="1">
+                <tr>
+                    <th>词语</th><th>词性</th><th>词频</th><th>操作</th>
+                </tr>
+            </table>
+        </div>
+    </div>
 </div>
+
 </body>
 </html>
 <script>
@@ -79,13 +102,15 @@
     });
 
     $(document).ready(function(){
-        //加载词性提示
-        getNatureDict();
         //看看url是否带着模型名称，如果带着，则自动加载到模型数据框内
         let modelPara = common.GetRequestParamValue("model");
         if (modelPara) {
             $("#modelInput").val(modelPara);
         }
+        //加载词性提示
+        getNatureDict();
+        //加载自定义词列表
+        getWordList();
     });
 
     /**
@@ -259,10 +284,80 @@
         }
     }
 
+    /**
+     * 保存自定义词典
+     */
+    function saveCustomWord() {
+        let word = $("#custom_word").val();
+        let nature = $("#custom_nature").val();
+        let frequency = $("#custom_frequency").val();
+        let dictType = $("#custom_type").val();
+        let dictModel = $("#modelInput").val();
+        if (!word) {
+            alert("自定义词必填");
+            return;
+        }
+        common.ajaxObj($,common.url.nlpSaveCustomWord,{
+            "word":word,"nature":nature,"frequency":frequency,"dictType":dictType,"dictModel":dictModel
+        },"POST",function (o) {
+            alert("保存成功");
+            getWordList();
+        });
+    }
+
+    /**
+     * 获取词性
+     */
+    function getNature() {
+        let word = $("#custom_word").val();
+        let dictModel = $("#modelInput").val();
+        if (!word) {
+            alert("自定义词必填");
+            return;
+        }
+        common.ajaxDefault($,common.url.nlpGetNature, {"word":word,"model":dictModel},"GET",function(o) {
+            if (o.data) {
+                $("#custom_nature").val(o.data.nature_en);
+                $("#custom_nature_cn").html("(" + o.data.nature_cn + ")");
+            }
+        });
+    }
+
+    /**
+     * 获取自定义词列表
+     */
+    function getWordList() {
+        let dictModel = $("#modelInput").val();
+        common.ajaxDefault($,common.url.nlpGetWordList, {"model":dictModel},"GET",function(o) {
+            $("#custom_word_table tr:gt(0)").remove();
+            let result = o.data;
+            for (let i = 0; i < result.length; i++) {
+                $("#custom_word_table").append("<tr id='custom_delTmp'>" +
+                    "<td>" + result[i].word + "</td>" +
+                    "<td>" + result[i].nature + "</td>" +
+                    "<td>" + result[i].frequency + "</td>" +
+                    "<td><a href='javascript:void(0)' onclick='delCustomWord(\"" + result[i].id + "\")'>删除</a></td>" +
+                    "</tr>");
+            }
+        });
+    }
+
+    /**
+     * 删除自定义词
+     * @param wordId
+     */
+    function delCustomWord(wordId) {
+        if (confirm("确实删除？")) {
+            common.ajaxDefault($,common.url.nlpDelWord, {"id":wordId},"POST",function(o) {
+                alert(o.data);
+                getWordList();
+            });
+        }
+    }
 
     //重新设置高度
     function resize() {
-        $("#natureDiv").height($(window).height() - 50);
+        $("#natureDiv").height($(window).height() - 350);
         $(".result").height($(window).height()/2 - 210);
     }
     window.onload = function (e) {
