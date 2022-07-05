@@ -16,10 +16,24 @@
    #resultTextarea {width: 100%;height: 100%;}
    #anaResult {width: 100%;height: 100%;}
    .color-red {color: red;}
+   .bgGreen {background-color: lawngreen;}
    .bgYellow {background-color: yellow;}
    a {text-decoration-line: none;}
+   .bigFont {font-size: 20px;}
 </style>
 <body>
+<div>
+    当前加载文本状:<span id="loadStatus" class="bgGreen">未加载</span>，
+    <!--文件路径：<input type="text" id="filePath" style="width:80px;">-->
+    <input type="file" id="sourceFile" value="选择文件">
+    <button onclick="loadFile()">加载文件</button>
+    一行大于多少字才返回：<input type="number" value="5" id="wordLength" style="width:30px;">
+    <button onclick="getContentFromMemery()">下一行</button>
+    <span id="txtResult" class="bgYellow"></span>
+    &nbsp;
+    加载到第<input type="number"  style="width:50px;" id="loadLine">行
+    <button onclick="loadLine()">加载</button>
+</div>
 <div style="float: left;width: 68%;">
     <div class="textareaDiv">
         <textarea id="contentTextarea" placeholder="请输入需要解析的文本，建议先从500字以内的一个段落开始"></textarea>
@@ -40,7 +54,7 @@
     </div>
     分词结果：
     <div class="result">
-        <textarea id="anaResult" placeholder="分词结果"></textarea>
+        <textarea id="anaResult" class="bigFont" placeholder="分词结果"></textarea>
     </div>
     <br/>
     <table cellpadding="5px">
@@ -61,18 +75,18 @@
     </table>
     训练语料:<span class="color-red">（训练时使用的是该文本框里的语料）</span>
     <div class="result">
-        <textarea id="resultTextarea" placeholder="训练使用语料"></textarea>
+        <textarea id="resultTextarea" class="bigFont" placeholder="训练使用语料"></textarea>
     </div>
 </div>
 
-<div id="natureDiv" style="float:left;margin-left: 10px;width: 28%;height: 300px; border: #5FB878 1px dashed; border-radius: 10px;">
+<div id="natureDiv" style="float:left;margin-left: 10px;width: 28%;height: 280px; border: #5FB878 1px dashed; border-radius: 10px;">
     <div style="width: 100%;height: 100%;overflow: auto;">
         <span style="font-size: 20px;margin:10px;">词性参考：</span><br/>
         <table id = "natureTable"></table>
     </div>
-    <div style="width: 100%;height: 320px;border: 1px red solid; margin-top:5px;">
+    <div style="width: 100%;height: 320px;border: #5FB878 1px dashed; margin-top:5px;">
 
-        <div style="float: left; width: 40%;border: yellow 1px solid;">
+        <div style="float: left; width: 40%;">
             自定义词(15字内)：<br/><input id="custom_word"><br/>
             词性(可点击分析词性自动获取)：<br/><input id="custom_nature" style="width: 30%;"><span id="custom_nature_cn" class="bgYellow"></span><br/>
             词频(1-100)：<br/><input id="custom_frequency" value="50"><br/>
@@ -80,7 +94,7 @@
             <button onclick="saveCustomWord()">保存</button>
             <button onclick="getNature()">分析词性</button>
         </div>
-        <div>
+        <div style="height: 100%; overflow: auto;">
             自定义词列表：
             <table id = "custom_word_table" border="1">
                 <tr>
@@ -97,7 +111,7 @@
 
     tinymce.init({
         selector: '#contentTextarea',
-        height: '250px',
+        height: '240px',
         menubar: false
     });
 
@@ -111,6 +125,8 @@
         getNatureDict();
         //加载自定义词列表
         getWordList();
+        //查看文件加载状态
+        loadStatus();
     });
 
     /**
@@ -140,6 +156,13 @@
     }
 
     /**
+     *  清空富文本框内容
+     */
+    function clearContentEditor() {
+        tinymce.activeEditor.setContent("");
+    }
+
+    /**
      * 给文字上颜色
      */
     function colorWord(keyword,color) {
@@ -149,9 +172,8 @@
 
     /**
      * NLP分词-语料训练框
-     * @param type
      */
-    function analyzeByModel(type) {
+    function analyzeByModel() {
         //纯文字
         let content = getContentFromEditor();
         let model = $("#modelInput").val();
@@ -355,9 +377,85 @@
         }
     }
 
+    /**
+     * 查看文件加载状态
+     */
+    function loadStatus() {
+        common.ajaxDefault($,common.url.nlpLoadStatus, null,"GET",function(o) {
+            if (o.data != null) {
+                $("#loadStatus").html("已加载,共："+ o.data + "行");
+            }
+        });
+    }
+
+    /**
+     * 加载文件
+     */
+    function loadFile() {
+        let formData = new FormData();
+        let file = $("#sourceFile").get(0).files[0];
+        if (!file) {
+            alert("请选择文件");
+            return;
+        }
+        formData.append("multipartFile",file);
+        $("body").mLoading("show");
+        $.ajax({
+            url: common.serverUrl + common.url.nlpLoadFile,
+            type: 'POST',
+            cache: false,
+            data: formData,
+            processData: false,
+            contentType: false,
+            dataType: "json",
+            success: function (o) {
+                $("body").mLoading("hide");
+                loadStatus();
+            },
+            error: function (error) {
+                $("body").mLoading("hide");
+                alert(error.responseJSON.message);
+            }
+        });
+
+
+        /*let filePath = $("#filePath").val();
+        common.ajaxDefault($,common.url.nlpLoadFile, {"filePath":filePath},"GET",function(o) {
+            alert(o.message);
+            $("#loadStatus").html("已加载");
+        });*/
+    }
+
+    /**
+     * 获取文件下一行
+     */
+    function getContentFromMemery() {
+        let length = $("#wordLength").val();
+        common.ajaxDefault($,common.url.nlpGetContentFromMemery, {"length":length},"GET",function(o) {
+            $("#txtResult").html(o.data.message);
+            let result = o.data.result;
+            //清空富文本框内容
+            clearContentEditor();
+            //将读取的每一行内容放到文本框中
+            setContentToEditor(result);
+            //自动分词
+            analyzeByModel();
+        });
+    }
+
+    /**
+     * 加载到第多少行
+     */
+    function loadLine() {
+        let line = $("#loadLine").val();
+        common.ajaxDefault($,common.url.nlpLoadLine, {"line":line},"GET",function(o) {
+            alert(o.message);
+        });
+    }
+
     //重新设置高度
     function resize() {
-        $("#natureDiv").height($(window).height() - 350);
+        $("#natureDiv").height($(window).height() - 365);
         $(".result").height($(window).height()/2 - 210);
     }
     window.onload = function (e) {

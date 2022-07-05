@@ -41,7 +41,11 @@ var common = {
         nlpSaveCustomWord: "/nlpModel/saveWord",
         nlpGetNature: "/nlpModel/getNature",
         nlpDelWord: "/nlpModel/delWord",
-        nlpGetWordList: "/nlpModel/getWordList"
+        nlpGetWordList: "/nlpModel/getWordList",
+        nlpLoadStatus: "/nlpModel/loadStatus",
+        nlpLoadFile: "/nlpModel/loadFile",
+        nlpLoadLine: "/nlpModel/loadLine",
+        nlpGetContentFromMemery: "/nlpModel/getContentFromMemery"
     },
 
     defaultType : [
