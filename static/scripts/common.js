@@ -45,6 +45,7 @@ var common = {
         nlpLoadStatus: "/nlpModel/loadStatus",
         nlpLoadFile: "/nlpModel/loadFile",
         nlpLoadLine: "/nlpModel/loadLine",
+        nlpLoadKeyWordToModel: "/nlpModel/loadKeyWordToModel",
         nlpGetContentFromMemery: "/nlpModel/getContentFromMemery"
     },
 

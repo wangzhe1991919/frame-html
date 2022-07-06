@@ -93,6 +93,9 @@
             类型(自定义)<br/>：<input id="custom_type"><br/>
             <button onclick="saveCustomWord()">保存</button>
             <button onclick="getNature()">分析词性</button>
+            <br/><br/>
+            <button onclick="loadKeyWordToModel()">加载词典至模型</button>
+
         </div>
         <div style="height: 100%; overflow: auto;">
             自定义词列表：
@@ -208,7 +211,7 @@
             let resultCompoundList = o.data.resultCompoundList;
             let resultCompoundText = "【复合词：---】";
             for (let i = 0; i < resultCompoundList.length; i++) {
-                resultCompoundText += resultCompoundList[i];
+                resultCompoundText += (resultCompoundList[i] + " ");
             }
             $("#anaResult").val(singleWordText + "\r\n\r\n" + resultCompoundText);
         });
@@ -449,6 +452,16 @@
     function loadLine() {
         let line = $("#loadLine").val();
         common.ajaxDefault($,common.url.nlpLoadLine, {"line":line},"GET",function(o) {
+            alert(o.message);
+        });
+    }
+
+    /**
+     * 加载词典至模型
+     */
+    function loadKeyWordToModel() {
+        let dictModel = $("#modelInput").val();
+        common.ajaxDefault($,common.url.nlpLoadKeyWordToModel, {"model":dictModel},"GET",function(o) {
             alert(o.message);
         });
     }
