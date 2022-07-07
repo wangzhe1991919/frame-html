@@ -33,6 +33,8 @@
     &nbsp;
     加载到第<input type="number"  style="width:50px;" id="loadLine">行
     <button onclick="loadLine()">加载</button>
+    &nbsp;
+    <button onclick="caculateAccuracy()">计算正确率</button>
 </div>
 <div style="float: left;width: 68%;">
     <div class="textareaDiv">
@@ -54,7 +56,7 @@
     </div>
     分词结果：
     <div class="result">
-        <textarea id="anaResult" class="bigFont" placeholder="分词结果"></textarea>
+        <textarea disabled id="anaResult" class="bigFont" placeholder="分词结果"></textarea>
     </div>
     <br/>
     <table cellpadding="5px">
@@ -132,6 +134,9 @@
         loadStatus();
     });
 
+    //全局-分词结果-单个词的（计算正确率时使用）
+    let global_nlp_result = "";
+
     /**
      * 获取富文本框中的内容（纯内容）
      * @returns
@@ -207,6 +212,8 @@
             for (let i = 0; i < singleWordList.length; i++) {
                 singleWordText += (singleWordList[i] + " ");
             }
+            global_nlp_result = singleWordText.replaceAll("【单个词：---】","");
+
             //分词复合词结果
             let resultCompoundList = o.data.resultCompoundList;
             let resultCompoundText = "【复合词：---】";
@@ -463,6 +470,16 @@
         let dictModel = $("#modelInput").val();
         common.ajaxDefault($,common.url.nlpLoadKeyWordToModel, {"model":dictModel},"GET",function(o) {
             alert(o.message);
+        });
+    }
+
+    /**
+     * 计算分词准确率
+     */
+    function caculateAccuracy() {
+        let manualResult = document.getElementById("resultTextarea").value;
+        common.ajaxDefault($,common.url.nlpCaculateAccuracy, {"autoResult":global_nlp_result,"manualResult":manualResult},"POST",function(o) {
+            alert(o.data);
         });
     }
 
