@@ -1,0 +1,80 @@
+body{
+	background-color:#333333;
+	font-size:16px;
+	color : #FFF;
+}
+
+.weather{
+	width:100%;
+	height:240px;
+	#border:1px red solid;
+}
+.kqzl{
+	float :left;
+	width : 100%;
+	margin-top: 10px;
+}
+.today{
+	#border:1px blue solid;
+	width : 40%;
+	height:100%;
+	float:left;
+	text-align:center;
+	line-height:16px;
+}
+.tomo{
+	#border:1px green solid;
+	width : 28%;
+	height:100%;
+	text-align:center;
+	line-height:16px;
+	float:left;
+}
+.aftomo{
+	#border:1px yellow solid;
+	width : 28%;
+	height:100%;
+	float:left;
+	text-align:center;
+	line-height:16px;
+}
+
+#air{
+	background-color:#FF4040;
+}
+#currTmp{
+	font-size:20px;
+}
+
+
+
+
+/*时间的css*/
+#date{
+	text-align:center;
+	margin-top:1%;
+	font-size:30px;
+}
+#ndate{
+	text-align:center;
+	margin-top:20px;
+	font-size:30px;
+}
+#clock{
+	margin-top: 10px;
+	text-align:center;
+	height:250px;
+}
+
+#week{
+	text-align:center;
+	margin-top:15px;
+	font-size:40px;
+}
+#seconds{
+    font-size:40px;
+}
+.min_br{
+	margin-top:8px;
+}
+

@@ -1,0 +1,62 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>天气</title>
+
+    <link rel="stylesheet" type="text/css" href="weather-clock.css">
+    <script src="../../static/jquery/jquery-3.3.1.min.js"></script>
+    <script src="../echarts.min.js"></script>
+	<script src="../dark.js"></script>
+</head>
+<body onload="init()">
+
+
+<div style="width:50%;height:300px;float:left;z-index:1;" id="left">
+
+    <div class="weather">
+        <div class="kqzl">&nbsp;&nbsp;<span id="city">天津</span>：实时空气质量：<span id="air">162 重度污染</span></div>
+        <div class="today">
+
+            <div><img width=60px; id="today_img"  src=""/></div>
+            <div><span id="currTmp">11</span>℃ <span id="currWeather">晴</span>&nbsp;(实时)</div>
+            <div class="min_br" id="today_temp">3-15℃</div>
+            <div class="min_br" id="today_cond">多云转晴</div>
+            <div class="min_br" id="today_wind">西北风3-4级</div>
+        </div>
+
+        <div class="tomo">
+            <br/>
+            <div id="tomo_week">星期五</div>
+            <div><img width=40px; id="tomo_img" src=""/></div>
+            <div class="min_br" id="tomo_temp">3-15℃</div>
+            <div class="min_br" id="tomo_cond">多云转晴</div>
+            <div class="min_br" id="tomo_wind">北风3-6级</div>
+        </div>
+
+        <div class="aftomo">
+            <br/>
+            <div id="aftomo_week">星期六</div>
+            <div><img width=40px; id="aftomo_img" src=""/></div>
+            <div class="min_br" id="aftomo_temp">2-9℃</div>
+            <div class="min_br" id="aftomo_cond">阴转小雨</div>
+            <div class="min_br" id="aftomo_wind">东风1-2级</div>
+        </div>
+
+    </div>
+    <!-- 为ECharts准备一个具备大小（宽高）的Dom -->
+    <div id="main" style="width:100%;height:240px;"></div>
+</div>
+
+<div style="width:50%;height:300px;float:left;z-index:99999;text-align: center;margin-top: 50px;">
+    <div id="date"></div>
+    <div id="ndate"></div>
+    <div id="clock"><iframe src="clock.html" style="height: 100%;border: none;"></iframe></div>
+    <div id="week"></div>
+</div>
+
+<script src="../nongli.js"></script>
+<script src="weather-clock.js"></script>
+
+</body>
+</html>

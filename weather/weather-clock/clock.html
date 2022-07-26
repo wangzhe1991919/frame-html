@@ -8,7 +8,7 @@
      canvas {background-color: rgba(255, 255, 255, 1);display: block;margin: 10px auto;}
  </style>
 </head>
- <body>
+ <body style="zoom: 0.4;background-color: #333333;">
  <canvas id="clock" width="600" height="600">当前浏览器不支持Canvas</canvas>
  <script>
          (function(){
@@ -16,6 +16,11 @@
                  let ctx = canvas.getContext("2d");
                  existRequestAnimationFrame();
                  draw(ctx);
+
+                document.getElementById("clock").onclick = function() {
+                  top.window.location.href="../weather.html";
+                }
+
              })();
          function existRequestAnimationFrame(){
                  var vendors = ['webkit', 'moz'];
@@ -83,7 +88,7 @@
                  //设置canvas四边角弧度区域为背景色
                  ctx.translate(0, 0);
                  ctx.beginPath();
-                 ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+                 ctx.fillStyle = 'rgba(51, 51, 51, 1)';
                  ctx.fillRect(0,0,600,600);
                  ctx.fill();
                  ctx.translate(300, 300);
@@ -99,8 +104,8 @@
                                  text = (i+1)+'';//数值
                          ctx.save();
                          ctx.beginPath();
-                         ctx.font = '35px Microsoft Yahei';
-                         ctx.fillStyle = 'rgb(0,0,0)';
+                         ctx.font = '45px Microsoft Yahei';
+                         ctx.fillStyle = 'rgb(51,51,51)';
                          ctx.fillText(text, 250*Math.cos(deg) - 6, 250*Math.sin(deg) + 7);
                          ctx.restore();
                      }

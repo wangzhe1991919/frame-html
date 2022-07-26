@@ -27,16 +27,16 @@ function setBackGroundColor(domId,rgb){
 function displayTime(){
 	var date = document.getElementById("date");
 	var ndate = document.getElementById("ndate");
-	var time = document.getElementById("time");
+	//var time = document.getElementById("time");
 	var week = document.getElementById("week");
 	var o = getCurrentDateTime();
 	date.innerHTML = o.date;
 	ndate.innerHTML = "农历：" + o.ndate;
-	time.innerHTML = o.time;
+	//time.innerHTML = o.time;
 	week.innerHTML = o.week;
 
 }
-setInterval("displayTime()",1000);//1000为1秒钟
+setInterval("displayTime()",1000 * 60 * 60);//1000为1秒钟
 
 
 function getWeekPlus(flag) {
@@ -435,7 +435,7 @@ function setWeather(weekDom,weekValue,imgDom,tempDom,condDom,windDom,dayData){
 	if (weekDom && weekValue) {
 		setHtmlValue(weekDom,getWeekPlus(weekValue));
 	}
-	setImgSrc(imgDom,"../static/weatherImg/sogou/" + dayData.wea_img + ".png");
+	setImgSrc(imgDom,"../../static/weatherImg/sogou/" + dayData.wea_img + ".png");
 	setHtmlValue(tempDom,dayData.tem2 + "-" + dayData.tem1);
 
 	setHtmlValue(condDom,dayData.wea);
@@ -459,9 +459,7 @@ function setWeather(weekDom,weekValue,imgDom,tempDom,condDom,windDom,dayData){
 function init() {
 	setWeatherData();
 	setWeatherQua();
-	document.getElementById("time").onclick = function() {
-		window.location.href="weather-clock/weather-clock.html";
-	}
+	displayTime();
 }
 
 setInterval("init()",10 * 60 * 1000);//1000为1秒钟
