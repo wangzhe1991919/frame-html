@@ -34,9 +34,7 @@ function displayTime(){
 	ndate.innerHTML = "农历：" + o.ndate;
 	time.innerHTML = o.time;
 	week.innerHTML = o.week;
-
 }
-setInterval("displayTime()",1000);//1000为1秒钟
 
 
 function getWeekPlus(flag) {
@@ -294,10 +292,6 @@ function getLunar(){
 /**获取农历 end*/
 
 
-
-
-
-
 //-------------------------chart   js-----------------------------
 
 function getOption(arr,now) {
@@ -311,7 +305,7 @@ function getOption(arr,now) {
 
 		if (arr != null && arr.length>0) {
 			for (var i = 0; i < arr.length; i++) {
-				var date = arr[i].day;
+				var date = arr[i].hours;
 				xAxisData.push(date);
 				var temp = arr[i].tem;
 				seriesData.push(temp.split("℃")[0]);
@@ -415,7 +409,7 @@ function setWeather(weekDom,weekValue,imgDom,tempDom,condDom,windDom,dayData){
 	if (weekDom && weekValue) {
 		setHtmlValue(weekDom,getWeekPlus(weekValue));
 	}
-	setImgSrc(imgDom,"../static/weatherImg/sogou/" + dayData.wea_img + ".png");
+	setImgSrc(imgDom,"../../static/weatherImg/sogou/" + dayData.wea_img + ".png");
 	setHtmlValue(tempDom,dayData.tem2 + "-" + dayData.tem1);
 
 	setHtmlValue(condDom,dayData.wea);
@@ -439,7 +433,7 @@ function setWeather(weekDom,weekValue,imgDom,tempDom,condDom,windDom,dayData){
 function init() {
 	setWeatherData();
 	document.getElementById("time").onclick = function() {
-		window.location.href="weather-clock/weather-clock.html";
+		window.location.href="../weather-clock/index.html";
 	}
 }
 
