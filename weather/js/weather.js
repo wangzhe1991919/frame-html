@@ -24,16 +24,18 @@ function setBackGroundColor(domId,rgb){
 	d.style.backgroundColor= rgb;
 }
 
-function displayTime(){
+function displayTime(refreshTime){
 	var date = document.getElementById("date");
 	var ndate = document.getElementById("ndate");
-	var time = document.getElementById("time");
 	var week = document.getElementById("week");
 	var o = getCurrentDateTime();
 	date.innerHTML = o.date;
 	ndate.innerHTML = "农历：" + o.ndate;
-	time.innerHTML = o.time;
 	week.innerHTML = o.week;
+	if (refreshTime) {
+		var time = document.getElementById("time");
+		time.innerHTML = o.time;
+	}
 }
 
 
@@ -298,17 +300,21 @@ function getOption(arr,now) {
 		var xAxisData = [];
 		var seriesData = [];
 
-        if (now) {
-            xAxisData.push("现在");
-            seriesData.push(now.tmp.split("℃")[0]);
-        }
+		let currDate = new Date();
+		let hours = currDate.getHours();
+		if (hours < 9) {hours = "0" + hours}
 
 		if (arr != null && arr.length>0) {
+			let currI = 0;
 			for (var i = 0; i < arr.length; i++) {
-				var date = arr[i].hours;
-				xAxisData.push(date);
-				var temp = arr[i].tem;
-				seriesData.push(temp.split("℃")[0]);
+				if (arr[i].hours.split("时")[0] === hours+"") {
+					currI = i;
+				}
+			}
+			for (var i = currI; i < arr.length; i++) {
+				//推送从现在开始往后的时间
+				xAxisData.push(arr[i].hours);
+				seriesData.push(arr[i].tem);
 			}
 		}
 			// 指定图表的配置项和数据
@@ -432,9 +438,6 @@ function setWeather(weekDom,weekValue,imgDom,tempDom,condDom,windDom,dayData){
 
 function init() {
 	setWeatherData();
-	document.getElementById("time").onclick = function() {
-		window.location.href="../weather-clock/index.html";
-	}
 }
 
 setInterval("init()",10 * 60 * 1000);//1000为1秒钟

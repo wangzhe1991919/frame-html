@@ -61,7 +61,10 @@
 <script src="../js/nongli.js"></script>
 <script src="../js/weather.js"></script>
 <script>
-    setInterval("displayTime()",1000);//1000为1秒钟
+    setInterval("displayTime(true)",1000);//1000为1秒钟
+    document.getElementById("time").onclick = function() {
+        window.location.href="../weather-clock/index.html";
+    }
 </script>
 </body>
 </html>
