@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>12328文件查询</title>
+    <link rel="stylesheet" type="text/css" href="../static/css/jquery.mloading.css">
+    <script src="../static/jquery/jquery-3.3.1.min.js"></script>
+    <script src="../static/jquery/jquery.mloading.js"></script>
+    <script src="../static/scripts/common.js"></script>
+</head>
+<style>
+    body{}
+    div {
+        border: 1px red solid;
+    }
+    table {width: 100%;}
+</style>
+<body>
+    <div>
+        <label>关键字<input id="keyWord" type="text"></label>
+        <label>结果数量<input id="limit" type="number" value="10"></label>
+        <label><input type="button" value="查询" onclick="query()"></label>
+    </div>
+
+        查询结果文件：
+    <div id = "result">
+        <table id="resultTable">
+
+        </table>
+    </div>
+    <div id="messageMap">
+
+    </div>
+</body>
+</html>
+<script>
+    function query() {
+
+        let keyWord = $("#keyWord").val();
+        let limit = $("#limit").val();
+
+        common.ajaxDefault($,common.url.neoQueryByKeywords, {"keyWord":keyWord,"limit":limit},"GET",function(o) {
+            let resultFiles = o.data.resultFiles;
+            let messageMap = o.data.messageMap;
+
+            $("#resultTable").empty();
+
+            for (var i = 0; i < resultFiles.length; i++) {
+                $("#resultTable").append("" +
+                    "<tr>" +
+                    "   <td><a id='resultALabel' href='#'>"+resultFiles[i].name+"."+resultFiles[i].fileType+"</a></td>" +
+                    "   <td><a id='resultALabel' href='#'>"+resultFiles[i].fileUrl+"</a></td>" +
+                    "</tr>");
+            }
+
+            $("#messageMap").empty();
+            for (let key in messageMap) {
+                $("#messageMap").append("<p>" + key + "--->" + messageMap[key] +"</p>");
+            }
+
+        });
+    }
+</script>

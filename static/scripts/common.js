@@ -14,6 +14,8 @@ var common = {
         deleteGenData : "/genManager/deleteGenData",
         getFileList : "/file/list",
 
+        getWeather : "/openapi-weather/getWeather",
+
         getSysNavigationGroup : "/sysNavigationGroup/get",
         insertSysNavigationGroup : "/sysNavigationGroup/add",
         updateSysNavigationGroup : "/sysNavigationGroup/update",
@@ -47,7 +49,10 @@ var common = {
         nlpLoadLine: "/nlpModel/loadLine",
         nlpCaculateAccuracy: "/nlpModel/caculateAccuracy",
         nlpLoadKeyWordToModel: "/nlpModel/loadKeyWordToModel",
-        nlpGetContentFromMemery: "/nlpModel/getContentFromMemery"
+        nlpGetContentFromMemery: "/nlpModel/getContentFromMemery",
+
+
+        neoQueryByKeywords: "/neo-query/queryByKeywords"
     },
 
     defaultType : [

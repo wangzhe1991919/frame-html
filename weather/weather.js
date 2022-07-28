@@ -363,32 +363,11 @@ function getOption(arr,now) {
 
 }
 
-
-	 // 基于准备好的dom，初始化echarts实例
+	// 基于准备好的dom，初始化echarts实例
    var myChart = echarts.init(document.getElementById('main'),'dark');
    // 使用刚指定的配置项和数据显示图表。
    //myChart.setOption(getOption(aaa),true);
 
-
-/**
- * 设置实时天气质量
- */
-function setWeatherQua() {
-	$.ajax({
-		type: 'GET',
-		async: false,
-		url: "https://www.tianqiapi.com/api/?version=v6&cityid=tianjin&appid=52391847&appsecret=KRxZ9ijE",
-		dataType: 'json',
-		success: function(data) {
-			//设置实时温度
-			setHtmlValue("currTmp",data.tem);
-			setHtmlValue("currWeather",data.wea);
-			//设置实时空气质量
-			setHtmlValue("air",data.air_pm25 + " " + data.air_level);
-			setBackGroundColor("air",global.aqi[data.air_level]);
-		}
-	});
-}
 
 /**
  * 设置天气数据
@@ -397,31 +376,32 @@ function setWeatherQua() {
  */
 function setWeatherData() {
 
-	$.ajax({
-		type: 'GET',
-		async: false,
-		url: "https://www.tianqiapi.com/api/?version=v1&cityid=tianjin&appid=52391847&appsecret=KRxZ9ijE",
-		dataType: 'json',
-		success: function(data) {
+	//默认查询天津的天气
+	common.ajaxDefault($,common.url.getWeather, {"cityId":101030100},"GET",function(o) {
+		let weather = JSON.parse(o.data.weather);
+		let qulity = JSON.parse(o.data.quality);
 
-			setHtmlValue("city",data.city);
-			//var o = JSON.parse(str);
+		//======================
+		setHtmlValue("city",weather.city);
+		//设置今天天气
+		setWeather(null,null,"today_img","today_temp","today_cond","today_wind",weather.data[0]);
+		//设置今天的气温曲线
+		var option = getOption(weather.data[0].hours);
+		myChart.setOption(option,false);
+		//设置明天天气
+		setWeather("tomo_week",1,"tomo_img","tomo_temp","tomo_cond","tomo_wind",weather.data[1]);
+		//设置后天天气
+		setWeather("aftomo_week",2,"aftomo_img","aftomo_temp","aftomo_cond","aftomo_wind",weather.data[2]);
 
-			//设置今天天气
-			setWeather(null,null,"today_img","today_temp","today_cond","today_wind",data.data[0]);
-			//设置今天的气温曲线
-			var option = getOption(data.data[0].hours);
-			myChart.setOption(option,false);
+		//=======================
+		//设置实时温度
+		setHtmlValue("currTmp",qulity.tem);
+		setHtmlValue("currWeather",qulity.wea);
+		//设置实时空气质量
+		setHtmlValue("air",qulity.air_pm25 + " " + qulity.air_level);
+		setBackGroundColor("air",global.aqi[qulity.air_level]);
 
-			//设置明天天气
-			setWeather("tomo_week",1,"tomo_img","tomo_temp","tomo_cond","tomo_wind",data.data[1]);
-
-			//设置后天天气
-			setWeather("aftomo_week",2,"aftomo_img","aftomo_temp","aftomo_cond","aftomo_wind",data.data[2]);
-
-		}
 	});
-
 }
 
 /**
@@ -458,7 +438,6 @@ function setWeather(weekDom,weekValue,imgDom,tempDom,condDom,windDom,dayData){
 
 function init() {
 	setWeatherData();
-	setWeatherQua();
 	document.getElementById("time").onclick = function() {
 		window.location.href="weather-clock/weather-clock.html";
 	}
