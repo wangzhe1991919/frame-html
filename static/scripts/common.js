@@ -52,7 +52,8 @@ var common = {
         nlpGetContentFromMemery: "/nlpModel/getContentFromMemery",
 
 
-        neoQueryByKeywords: "/neo-query/queryByKeywords"
+        neoQueryByKeywords: "/neo-query/queryByKeywords",
+        neoQueryFileAboutFile: "//neo-query/queryFileAboutFile"
     },
 
     defaultType : [

@@ -11,53 +11,124 @@
 <style>
     body{}
     div {
-        border: 1px red solid;
+        border: 1px #9F9F9F solid;
+        border-radius: 5px;
     }
     table {width: 100%;}
+    .iconImg{width: 25px;height: 25px;}
+    .filePath{font-size: 10px;color: #333333;}
+    #messageMap{height:80px;}
+    #result{overflow: auto;width: 49%;float: left;}
+    #recommend{overflow: auto;width: 49%;}
+    #messageMap{overflow: auto;}
+    .divMsg{width: 49%;float: left;}
 </style>
 <body>
     <div>
+        <label>查询条件-></label>
         <label>关键字<input id="keyWord" type="text"></label>
-        <label>结果数量<input id="limit" type="number" value="10"></label>
+        <label>查询结果数量<input id="limit" type="number" value="10"></label>
+        <label>推荐数量<input id="recommendLimit" type="number" value="10"></label>
         <label><input type="button" value="查询" onclick="query()"></label>
     </div>
 
-        查询结果文件：
-    <div id = "result">
-        <table id="resultTable">
-
-        </table>
+    <div class="divMsg"><span>查询结果文件:</span></div>
+    <div class="divMsg"><span>点击文件后的相关推荐:</span></div>
+    <div id = "result" >
+        <table id="resultTable"></table>
     </div>
-    <div id="messageMap">
-
+    <div id = "recommend" >
+        <table id="recommendTable"></table>
     </div>
+    查询日志:
+    <div id="messageMap"></div>
 </body>
 </html>
 <script>
+    /**
+     *  根据关键字查询相关文件
+     */
     function query() {
-
         let keyWord = $("#keyWord").val();
         let limit = $("#limit").val();
-
+        if (!keyWord || !limit) {
+            alert("查询条件不能为空");
+            return;
+        }
         common.ajaxDefault($,common.url.neoQueryByKeywords, {"keyWord":keyWord,"limit":limit},"GET",function(o) {
             let resultFiles = o.data.resultFiles;
             let messageMap = o.data.messageMap;
-
             $("#resultTable").empty();
-
             for (var i = 0; i < resultFiles.length; i++) {
+                let iconSrc = getFileTypeIconSrc(resultFiles[i].fileType);
                 $("#resultTable").append("" +
                     "<tr>" +
-                    "   <td><a id='resultALabel' href='#'>"+resultFiles[i].name+"."+resultFiles[i].fileType+"</a></td>" +
-                    "   <td><a id='resultALabel' href='#'>"+resultFiles[i].fileUrl+"</a></td>" +
+                    "   <td><img class='iconImg' src='" + iconSrc + "'><a href='javascript:void(0)'" +
+                    " onclick='recommend(\"" + resultFiles[i].id + "\")'>"+resultFiles[i].name+"."+resultFiles[i].fileType+"</a>" +
+                    "   <br/>" +
+                    "   <span class='filePath'>文件路径："+resultFiles[i].fileUrl+"</span>" +
+                    "   </td>" +
                     "</tr>");
             }
-
-            $("#messageMap").empty();
-            for (let key in messageMap) {
-                $("#messageMap").append("<p>" + key + "--->" + messageMap[key] +"</p>");
-            }
-
+            refreshLog(messageMap);
         });
     }
+
+    /**
+     * 推荐,  根据文件id
+     * @param fileId
+     */
+    function recommend(fileId) {
+        let limit = $("#recommendLimit").val();
+        common.ajaxDefault($,common.url.neoQueryFileAboutFile, {"fileId":fileId,"limit":limit},"GET",function(o) {
+            let resultFiles = o.data.resultFiles;
+            let messageMap = o.data.messageMap;
+            $("#recommendTable").empty();
+            for (var i = 0; i < resultFiles.length; i++) {
+                let iconSrc = getFileTypeIconSrc(resultFiles[i].fileType);
+                $("#recommendTable").append("" +
+                    "<tr>" +
+                    "   <td><img class='iconImg' src='" + iconSrc + "'><a href='javascript:void(0)'>" +
+                    "" +resultFiles[i].name+"."+resultFiles[i].fileType+"</a>" +
+                    "   <br/>" +
+                    "   <span class='filePath'>文件路径："+resultFiles[i].fileUrl+"</span>" +
+                    "   </td>" +
+                    "</tr>");
+            }
+            refreshLog(messageMap);
+        });
+
+    }
+
+    function refreshLog(messageMap) {
+        $("#messageMap").empty();
+        for (let key in messageMap) {
+            $("#messageMap").append("<span>" + key + messageMap[key] +"</span><br/>");
+        }
+    }
+
+    function getFileTypeIconSrc(fileType) {
+        fileType = fileType.toLowerCase();
+        let word = ["doc","docx"];
+        let ppt = ["ppt","pptx"];
+        let excel = ["xls","xlsx"];
+        let file = ["log","ini","txt","db"];
+        let img = ["png","jpg","jpeg","gif","bmp"];
+        if (word.indexOf(fileType) > -1) {fileType = "word"}
+        if (excel.indexOf(fileType) > -1) {fileType = "excel"}
+        if (file.indexOf(fileType) > -1) {fileType = "file"}
+        if (img.indexOf(fileType) > -1) {fileType = "img"}
+        if (ppt.indexOf(fileType) > -1) {fileType = "ppt"}
+        return "../static/imgs/fileImg/"+fileType+".png";
+    }
+
+    //重新设置高度
+    function resize() {
+        $("#result").height($(window).height() - 180);
+        $("#recommend").height($(window).height() - 180);
+    }
+    window.onload = function (e) {
+        resize();
+    }
+
 </script>
