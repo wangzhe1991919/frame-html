@@ -1,3 +1,8 @@
+document.write('<script src="/static/jquery/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>');
+document.write('<script src="/static/jquery/jquery.mloading.js" type="text/javascript" charset="utf-8"></script>');
+document.write('<link rel="stylesheet" type="text/css" href="/static/css/jquery.mloading.css">');
+
+
 var common = {
     serverUrl : "http://" + window.location.host + "/wz",//部署应该是nginx的端口（部署前端应用的端口）
     indexPage : "http://" + window.location.host + "/navigation/index.html",
@@ -96,7 +101,7 @@ var common = {
     /**
      * 公共ajax
      */
-    ajaxObj : function($,url,param,type,callback,contentType) {
+    ajaxObj : function($,url,param,type,callback,contentType,hideLoading) {
         if (!type) {
             type = "POST";
         }
@@ -104,7 +109,10 @@ var common = {
             contentType = "application/json;charset=utf-8";
             param = JSON.stringify(param);
         }
-        $("body").mLoading("show");
+
+        if (!hideLoading) {
+            $("body").mLoading("show");
+        }
         $.ajax({
             type: type,
             url: common.serverUrl + url,
@@ -130,8 +138,8 @@ var common = {
     /**
      * 参数式ajax请求调用
      */
-    ajaxDefault : function($,url,param,type,callback) {
-        common.ajaxObj($,url,param,type,callback,"application/x-www-form-urlencoded;charset=utf-8");
+    ajaxDefault : function($,url,param,type,callback,hideLoading) {
+        common.ajaxObj($,url,param,type,callback,"application/x-www-form-urlencoded;charset=utf-8",hideLoading);
     },
 
     /**
@@ -174,5 +182,4 @@ var common = {
         }
         return null;
     }
-
 };

@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>导航</title>
-    <script src="../static/jquery/jquery-3.3.1.min.js"></script>
     <script src="../static/scripts/common.js"></script>
 </head>
 <style>
@@ -121,14 +120,14 @@
 <body>
 
     <div class="manage-div">
-        <div class="img-babby"><img src="http://47.101.47.106:8000/miaomiao/1.png"></div>
-        <div class="img-babby"><img src="http://47.101.47.106:8000/miaomiao/2.png"></div>
-        <div class="img-babby"><img src="http://47.101.47.106:8000/miaomiao/3.png"></div>
-        <div class="img-babby"><img src="http://47.101.47.106:8000/miaomiao/4.png"></div>
-        <div class="img-babby"><img src="http://47.101.47.106:8000/miaomiao/5.png"></div>
-        <div class="img-babby"><img src="http://47.101.47.106:8000/miaomiao/6.png"></div>
-        <div class="img-babby"><img src="http://47.101.47.106:8000/miaomiao/7.png"></div>
-        <div class="img-babby"><img src="http://47.101.47.106:8000/miaomiao/8.png"></div>
+        <div class="img-babby"><img src="http://47.101.47.106/staticFile/miaomiao/1.png"></div>
+        <div class="img-babby"><img src="http://47.101.47.106/staticFile/miaomiao/2.png"></div>
+        <div class="img-babby"><img src="http://47.101.47.106/staticFile/miaomiao/3.png"></div>
+        <div class="img-babby"><img src="http://47.101.47.106/staticFile/miaomiao/4.png"></div>
+        <div class="img-babby"><img src="http://47.101.47.106/staticFile/miaomiao/5.png"></div>
+        <div class="img-babby"><img src="http://47.101.47.106/staticFile/miaomiao/6.png"></div>
+        <div class="img-babby"><img src="http://47.101.47.106/staticFile/miaomiao/7.png"></div>
+        <div class="img-babby"><img src="http://47.101.47.106/staticFile/miaomiao/8.png"></div>
 
         <div class="config-btn">
             <a href="groupList.html">导航分组管理</a>
@@ -185,7 +184,7 @@
                 let url = this.dataset.url;
                 window.open(url);
             });
-        });
+        },null,true);
     }
 
     ////加载笔记数据
@@ -195,7 +194,7 @@
             $("#note-id").val(data.id);
             $(".note").val(data.content);
             noteStr = data.content;
-        })
+        },null,true)
     }
 
     //保存笔记
@@ -203,7 +202,7 @@
         common.ajaxObj($,common.url.insertNote,{id:$("#note-id").val(),content:$(".note").val()},"POST",function (o) {
             $(".msg").html("最近保存成功时间：" + o.data);
             initNoteData();
-        });
+        },null,true);
     }
 
     //保存并新建笔记
