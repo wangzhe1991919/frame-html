@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>UUID生成</title>
+    <script src="../../static/jquery/jquery-3.3.1.min.js"></script>
+</head>
+<body>
+<h1>UUID生成</h1>
+<form id="uuidForm">
+    <div>
+        <label for="countInput">数量:</label>
+        <input type="number" min="1" max="100" id="countInput" value="10"/>
+    </div>
+
+    <div>
+        <label>大小写:</label>
+        <input type="radio" name="case" value="upper" id="upperRadio"/>
+        <label for="upperRadio">大写</label>
+        <input type="radio" name="case" value="lower" id="lowerRadio" checked/>
+        <label for="lowerRadio">小写</label>
+    </div>
+
+    <div>
+        <label>是否携带'-'号:</label>
+        <input type="radio" name="hyphen" value="yes" id="hyphenYesRadio"/>
+        <label for="hyphenYesRadio">是</label>
+        <input type="radio" name="hyphen" value="no" id="hyphenNoRadio" checked/>
+        <label for="hyphenNoRadio">否</label>
+    </div>
+
+    <div>
+        <button type="submit">生成</button>
+        <button id="copyButton">复制结果</button>
+    </div>
+</form>
+
+<hr/>
+
+<textarea id="uuidOutput" rows="10" cols="50" readonly></textarea>
+
+<script>
+    function generateUUID(count, uppercase, hyphen) {
+        var uuidList = [];
+        var pattern = hyphen ? "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" : "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+        var patternUpperCase = pattern.toUpperCase();
+        for (var i = 0; i < count; i++) {
+            var patternToUse = uppercase ? patternUpperCase : pattern;
+            var uuid = "";
+            for (var j = 0; j < patternToUse.length; j++) {
+                var c = patternToUse.charAt(j);
+                if (uppercase && c === "X") {
+                    uuid += Math.floor(Math.random() * 16).toString(16).toUpperCase();
+                } else if (c === "x") {
+                    uuid += (Math.floor(Math.random() * 16).toString(16));
+                } else if (hyphen && (j === 8 || j === 13 || j === 18 || j === 23)) {
+                    uuid += "-";
+                }
+            }
+            uuidList.push(uuid);
+        }
+        return uuidList.join("\n");
+    }
+
+    $("#uuidForm").submit(function(event) {
+        event.preventDefault();
+        var count = $("#countInput").val();
+        var uppercase = $("input[name='case']:checked").val() === "upper";
+        var hyphen = $("input[name='hyphen']:checked").val() === "yes";
+        var uuids = generateUUID(count, uppercase, hyphen);
+        $("#uuidOutput").val(uuids);
+    });
+
+    $("#copyButton").click(function(event) {
+        event.preventDefault();
+        var uuidsText = document.getElementById("uuidOutput");
+        uuidsText.select();
+        document.execCommand("copy");
+    });
+</script>
+</body>
+</html>
