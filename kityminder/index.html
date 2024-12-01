@@ -43,8 +43,8 @@
 		}
 	</style>
 </head>
-	<body ng-app="kityminderDemo" ng-controller="MainController">
-	<h1 class="editor-title">脑图
+<body ng-app="kityminderDemo" ng-controller="MainController">
+	<h1 class="editor-title"><span id="titleSpan">脑图</span>
 		&nbsp;&nbsp;&nbsp;
 		<button onclick="save()">保存</button>
 		&nbsp;&nbsp;&nbsp;
@@ -57,7 +57,8 @@
 </body>
 
 <!-- bower:js -->
-<script src="../kityminder/bower_components/jquery/dist/jquery.js"></script>
+<script src="../static/scripts/common.js"></script>
+<!--<script src="../kityminder/bower_components/jquery/dist/jquery.js"></script>-->
 <script src="../kityminder/bower_components/bootstrap/dist/js/bootstrap.js"></script>
 <script src="../kityminder/bower_components/angular/angular.js"></script>
 <script src="../kityminder/bower_components/angular-bootstrap/ui-bootstrap-tpls.js"></script>
@@ -83,6 +84,9 @@
 
 
 <script>
+
+	//load();
+
 	angular.module('kityminderDemo', ['kityminderEditor'])
 			.config(function (configProvider) {
 				//上传文件
@@ -92,16 +96,31 @@
 				$scope.initEditor = function(editor, minder) {
 					window.editor = editor;
 					window.minder = minder;
+					load();
 				};
 			});
+		//保存
 		function save() {
-			var result = editor.minder.exportJson()
-			console.log("--------->>>" + JSON.stringify(result));
+			const result = editor.minder.exportJson()
+			const fileId = common.GetRequestParamValue("fileId");
+			common.ajaxDefault($,common.functionUrl.updateFileByType,
+					{"functionFileId":fileId,"fileType":"mind",content:JSON.stringify(result)},"POST",
+					function(o){
+						alert("保存成功");
+					});
 		}
-
+		//加载
 		function load() {
-			var tmp ="{\"root\":{\"data\":{\"id\":\"d5zjkppqmbs0\",\"created\":1732972764980,\"text\":\"aa\"},\"children\":[{\"data\":{\"id\":\"d5zjld8u93c0\",\"created\":1732972816201,\"text\":\"1\"},\"children\":[]},{\"data\":{\"id\":\"d5zjldtag1k0\",\"created\":1732972817438,\"text\":\"2\",\"note\":\"awdawd\"},\"children\":[]}]},\"template\":\"tianpan\",\"theme\":\"fresh-purple\",\"version\":\"1.4.43\"}"
-			editor.minder.importJson(JSON.parse(tmp));
+			const fileId = common.GetRequestParamValue("fileId");
+			const fileName = common.GetRequestParamValue("fileName");
+			common.ajaxDefault($,common.functionUrl.getFileDetail,{"fileId":fileId,"fileType":"mind"},"GET",function(o){
+				const data = o.data;
+				if (data.content) {
+					editor.minder.importJson(JSON.parse(tmp));
+					document.title = fileName;
+					$('#titleSpan').text(fileName);
+				}
+			});
 		}
 
 		function exportObject() {

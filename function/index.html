@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>主页</title>
+    <script src="../static/scripts/common.js"></script>
+</head>
+<style>
+    .btns{
+        float: left;
+        margin: 20px;
+        border: 1px solid red;
+        width: 66px;
+        height: 66px;
+        text-align: center;
+    }
+    .btns:hover{
+        background-color: #3498db;
+        cursor: pointer;
+    }
+
+</style>
+<body>
+    <div id="navigation">
+        <!--<a href="javascript:void(0)" onclick="initDirectoryAndFiles(null)">根目录</a>
+        /
+        <a href="javascript:void(0)" onclick="initDirectoryAndFiles('asdas')">111</a>-->
+    </div>
+    <div id="main">
+
+    </div>
+</body>
+</html>
+
+
+
+<script>
+    /*
+    导航的列表
+    数据结构{name:"",id:""}
+    */
+    const navigationList = [{name:"根目录",id:"0"}];
+    //初始化根目录
+    initDirectoryAndFiles(null);
+    //刷新导航
+    refreshNavigation();
+    //当前当行层级
+    const currNavigationLevel = 0;
+
+    const floderIcon = "http://47.101.47.106/staticFile/icon/folder-48.png";
+    const mindMap = "http://47.101.47.106/staticFile/icon/mind-map-48.png";
+
+    //加载导航数据
+    function initDirectoryAndFiles(pid) {
+        common.ajaxDefault($,common.functionUrl.getListByPid,{"pid":pid},"GET",function(o){
+            clearMain();
+            refreshNavigation()
+            const data = o.data;
+            //目录
+            const directorys = data.directoryList;
+            //文件
+            const files = data.fileList;
+            if (directorys) {
+                for (let i = 0; i < directorys.length; i++) {
+                    const dirId = directorys[i].id;
+                    const dirName = directorys[i].name;
+                    $("#main").append(
+                        "<div onclick='directoryClick(\""+ dirId+"\",\"" + dirName + "\")' " +
+                        "class='btns' id='"+ dirId + "' style='height:100%;'>" +
+                            "<image src='"+floderIcon+"'/>" +
+                            "<br/><span class='dirName'>" + dirName + "</span>" +
+                        "</div>");
+                }
+            }
+            if (files) {
+                for (let i = 0; i < files.length; i++) {
+                    const fileId = files[i].id;
+                    const fileName = files[i].name;
+                    const fileType = files[i].type;
+                    $("#main").append(
+                        "<div onclick='fileClick(\""+ fileId+"\",\"" + fileType + "\",\"" + fileName + "\")' " +
+                        " class='btns' id='"+ fileId + "' style='height:100%;'>" +
+                        "<image src='"+mindMap+"'/>" +
+                        "<br/><span class='fileName'>" + fileName + "</span>" +
+                        "</div>");
+                }
+            }
+        },null,true);
+    }
+
+    /**
+     * 目录点击事件
+     * @param dirId
+     * @param dirName
+     */
+    function directoryClick(dirId,dirName) {
+        clearMain();
+        navigationList.push({"name":dirName,"id":dirId});
+        initDirectoryAndFiles(dirId);
+    }
+
+    /**
+     * 文件点击事件
+     * @param fileId
+     */
+    function fileClick(fileId,fileType,fileName) {
+        if ("mind" === fileType) {
+            window.open("../kityminder/index.html?fileId=" + fileId + "&fileName=" + fileName);
+        }
+    }
+
+    /**
+     * 刷新导航
+     */
+    function refreshNavigation() {
+        $('#navigation').empty();
+        if (navigationList) {
+            for (let i = 0; i < navigationList.length; i++) {
+                $("#navigation").append("<a href=\"javascript:void(0)\" onclick=\"initDirectoryAndFiles(\'" + navigationList[i].id + "\')\">"+navigationList[i].name+"</a>");
+                if (i !== navigationList.length-1) {
+                    $("#navigation").append(" / ");
+                }
+            }
+        }
+    }
+
+    function clearMain() {
+        $('#main').empty();
+    }
+</script>
