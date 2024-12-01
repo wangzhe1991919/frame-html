@@ -103,8 +103,8 @@
 		function save() {
 			const result = editor.minder.exportJson()
 			const fileId = common.GetRequestParamValue("fileId");
-			common.ajaxDefault($,common.functionUrl.updateFileByType,
-					{"functionFileId":fileId,"fileType":"mind",content:JSON.stringify(result)},"POST",
+			common.ajaxObj($,common.functionUrl.updateFileByType,
+					{"functionFileId":fileId,"fileType":"mind","content":JSON.stringify(result)},"POST",
 					function(o){
 						alert("保存成功");
 					});
@@ -116,7 +116,7 @@
 			common.ajaxDefault($,common.functionUrl.getFileDetail,{"fileId":fileId,"fileType":"mind"},"GET",function(o){
 				const data = o.data;
 				if (data.content) {
-					editor.minder.importJson(JSON.parse(tmp));
+					editor.minder.importJson(JSON.parse(data.content));
 					document.title = fileName;
 					$('#titleSpan').text(fileName);
 				}
