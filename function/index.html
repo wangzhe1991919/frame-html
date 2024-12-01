@@ -9,7 +9,7 @@
     .btns{
         float: left;
         margin: 20px;
-        border: 1px solid red;
+        /*border: 1px solid gray;*/
         width: 66px;
         height: 66px;
         text-align: center;
@@ -44,8 +44,6 @@
     initDirectoryAndFiles(null);
     //刷新导航
     refreshNavigation();
-    //当前当行层级
-    const currNavigationLevel = 0;
 
     const floderIcon = "http://47.101.47.106/staticFile/icon/folder-48.png";
     const mindMap = "http://47.101.47.106/staticFile/icon/mind-map-48.png";
@@ -54,7 +52,7 @@
     function initDirectoryAndFiles(pid) {
         common.ajaxDefault($,common.functionUrl.getListByPid,{"pid":pid},"GET",function(o){
             clearMain();
-            refreshNavigation()
+            refreshNavigation(pid)
             const data = o.data;
             //目录
             const directorys = data.directoryList;
@@ -112,7 +110,15 @@
     /**
      * 刷新导航
      */
-    function refreshNavigation() {
+    function refreshNavigation(pid) {
+        if (!pid) pid = 0;
+        //当前时哪个目录，将navigationList中当前目录之后的全部去掉
+        const targetIndex = navigationList.findIndex(item => item.id === pid);
+        if (targetIndex !== -1) {
+            // 从目标索引开始删除后面的所有元素
+            navigationList.splice(targetIndex + 1);
+        }
+        //重新构造导航
         $('#navigation').empty();
         if (navigationList) {
             for (let i = 0; i < navigationList.length; i++) {
@@ -124,6 +130,9 @@
         }
     }
 
+    /**
+     * 清空main内的元素
+     */
     function clearMain() {
         $('#main').empty();
     }

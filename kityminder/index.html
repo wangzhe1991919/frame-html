@@ -115,7 +115,7 @@
 			const fileName = common.GetRequestParamValue("fileName");
 			common.ajaxDefault($,common.functionUrl.getFileDetail,{"fileId":fileId,"fileType":"mind"},"GET",function(o){
 				const data = o.data;
-				if (data.content) {
+				if (data && data.content) {
 					editor.minder.importJson(JSON.parse(data.content));
 					document.title = fileName;
 					$('#titleSpan').text(fileName);
