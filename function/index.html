@@ -4,14 +4,26 @@
     <meta charset="UTF-8">
     <title>主页</title>
     <script src="../static/scripts/common.js"></script>
+    <link rel="stylesheet" href="../static/jquery-ui-1.14.1.custom/jquery-ui.css">
+    <script src="../static/jquery-ui-1.14.1.custom/jquery-ui.js"></script>
+
 </head>
 <style>
-    .btns{
+
+    .floatLeft {
         float: left;
+        width: 88px;
+        height: 88px;
         margin: 20px;
         /*border: 1px solid gray;*/
-        width: 66px;
-        height: 66px;
+    }
+
+    .btns {
+        /*float: left;*/
+
+        /*border: 1px solid red;*/
+        width: 100%;
+        height: 100%;
         text-align: center;
     }
     .btns:hover{
@@ -19,27 +31,66 @@
         cursor: pointer;
     }
 
+    .smallBtn {
+        /*border: 1px solid blue;*/
+        font-size: 13px;
+        color: #1c6ca1;
+    }
+    .btnDiv{
+        text-align: center;
+        /*border: 1px solid yellow;*/
+    }
+
+    .naviga {
+        color: #1c6ca1;
+    }
+
+    label, input { display:block; }
+    input.text { margin-bottom:12px; width:95%; padding: .4em; }
+    fieldset { padding:0; border:0; margin-top:25px; }
+    h1 { font-size: 1.2em; margin: .6em 0; }
+    /*div#users-contain { width: 350px; margin: 20px 0; }
+    div#users-contain table { margin: 1em 0; border-collapse: collapse; width: 100%; }
+    div#users-contain table td, div#users-contain table th { border: 1px solid #eee; padding: .6em 10px; text-align: left; }*/
+    .ui-dialog .ui-state-error { padding: .3em; }
+    .validateTips { border: 1px solid transparent; padding: 0.3em; }
+
 </style>
 <body>
-    <div id="navigation">
-        <!--<a href="javascript:void(0)" onclick="initDirectoryAndFiles(null)">根目录</a>
-        /
-        <a href="javascript:void(0)" onclick="initDirectoryAndFiles('asdas')">111</a>-->
-    </div>
-    <div id="main">
 
+    <button id="create-floder">添加文件夹</button>
+    <div id="navigation"></div>
+    <div id="main"></div>
+
+
+    <div id="floder-form" title="表单">
+        <p class="validateTips"></p>
+        <form>
+            <fieldset>
+                <label for="name">文件夹名称</label>
+                <input type="text" name="name" id="name" class="text ui-widget-content ui-corner-all">
+                <label for="name">排序</label>
+                <input type="number" name="sort" id="sort" class="text ui-widget-content ui-corner-all">
+            </fieldset>
+        </form>
     </div>
+
 </body>
 </html>
 
 
 
 <script>
+    //当前页面目录的pid
+    let currPid = "0";
+
     /*
     导航的列表
     数据结构{name:"",id:""}
     */
     const navigationList = [{name:"根目录",id:"0"}];
+    //当前页面的目录父ID
+
     //初始化根目录
     initDirectoryAndFiles(null);
     //刷新导航
@@ -51,6 +102,7 @@
     //加载导航数据
     function initDirectoryAndFiles(pid) {
         common.ajaxDefault($,common.functionUrl.getListByPid,{"pid":pid},"GET",function(o){
+            currPid = pid;
             clearMain();
             refreshNavigation(pid)
             const data = o.data;
@@ -63,11 +115,20 @@
                     const dirId = directorys[i].id;
                     const dirName = directorys[i].name;
                     $("#main").append(
+                        "<div class='floatLeft'>" +
                         "<div onclick='directoryClick(\""+ dirId+"\",\"" + dirName + "\")' " +
                         "class='btns' id='"+ dirId + "' style='height:100%;'>" +
-                            "<image src='"+floderIcon+"'/>" +
-                            "<br/><span class='dirName'>" + dirName + "</span>" +
-                        "</div>");
+                        "<image src='"+floderIcon+"'/>" +
+                        "<br/>" +
+                        "<span class='dirName'>" + dirName + "</span>" +
+                        "<br/>" +
+                        "</div>" +
+                        "<div class='btnDiv'>" +
+                        "<a class='smallBtn' href=\"javascript:void(0)\" onclick=\"editDirtory(\'" + files[i].id + "\')\">编辑</a>" +
+                        "&nbsp;" +
+                        "<a class='smallBtn' href=\"javascript:void(0)\" onclick=\"deleteDirtory(\'" + files[i].id + "\')\">删除</a>" +
+                        "</div>"
+                        + "</div>");
                 }
             }
             if (files) {
@@ -76,14 +137,35 @@
                     const fileName = files[i].name;
                     const fileType = files[i].type;
                     $("#main").append(
+                        "<div class='floatLeft'>" +
                         "<div onclick='fileClick(\""+ fileId+"\",\"" + fileType + "\",\"" + fileName + "\")' " +
                         " class='btns' id='"+ fileId + "' style='height:100%;'>" +
                         "<image src='"+mindMap+"'/>" +
-                        "<br/><span class='fileName'>" + fileName + "</span>" +
-                        "</div>");
+                        "<br/>" +
+                        "<span class='fileName'>" + fileName + "</span>" +
+                        "</div>" +
+                        "<div class='btnDiv'>" +
+                        "<a class='smallBtn' href=\"javascript:void(0)\" onclick=\"editFile(\'" + files[i].id + "\')\">编辑</a>" +
+                        "&nbsp;" +
+                        "<a class='smallBtn' href=\"javascript:void(0)\" onclick=\"deleteFile(\'" + files[i].id + "\')\">删除</a>" +
+                        "</div>"
+                        + "</div>");
                 }
             }
         },null,true);
+    }
+
+    function editDirtory(id) {
+        alert(id);
+    }
+    function deleteDirtory(id) {
+        alert(id);
+    }
+    function editFile(id) {
+        alert(id);
+    }
+    function deleteFile(id) {
+        alert(id);
     }
 
     /**
@@ -122,7 +204,7 @@
         $('#navigation').empty();
         if (navigationList) {
             for (let i = 0; i < navigationList.length; i++) {
-                $("#navigation").append("<a href=\"javascript:void(0)\" onclick=\"initDirectoryAndFiles(\'" + navigationList[i].id + "\')\">"+navigationList[i].name+"</a>");
+                $("#navigation").append("<a class='naviga' href=\"javascript:void(0)\" onclick=\"initDirectoryAndFiles(\'" + navigationList[i].id + "\')\">"+navigationList[i].name+"</a>");
                 if (i !== navigationList.length-1) {
                     $("#navigation").append(" / ");
                 }
@@ -136,4 +218,52 @@
     function clearMain() {
         $('#main').empty();
     }
+
+    $( function() {
+        let floderDialog, form
+
+
+        //更新提示框
+        function updateTips( t ) {
+            tips.text( t ).addClass( "ui-state-highlight" );
+            setTimeout(function() {
+                tips.removeClass( "ui-state-highlight", 1500 );
+            }, 500 );
+        }
+
+        function addUser() {
+            let name = $("#name").val();
+            let sort = $("#sort").val();
+
+           return valid;
+        }
+
+        floderDialog = $("#floder-form").dialog({
+            autoOpen: false,
+            height: 400,
+            width: 350,
+            modal: true,
+            buttons: {
+                "创建": addUser,
+                Cancel: function() {
+                    floderDialog.dialog( "close" );
+                }
+            },
+            close: function() {
+                form[ 0 ].reset();
+            }
+        });
+
+        form = floderDialog.find( "form" ).on( "submit", function( event ) {
+            event.preventDefault();
+            addUser();
+        });
+
+        $( "#create-floder" ).button().on( "click", function() {
+            floderDialog.dialog( "open" );
+        });
+    } );
+
+
+
 </script>
