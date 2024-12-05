@@ -67,10 +67,11 @@
         <p class="validateTips"></p>
         <form>
             <fieldset>
-                <label for="name">文件夹名称</label>
-                <input type="text" name="name" id="name" class="text ui-widget-content ui-corner-all">
-                <label for="name">排序</label>
-                <input type="number" name="sort" id="sort" class="text ui-widget-content ui-corner-all">
+                <input name="dir_id" id="dir_id" type="hidden" hidden="hidden">
+                <label for="dir_name">文件夹名称</label>
+                <input type="text" name="name" id="dir_name" class="text ui-widget-content ui-corner-all">
+                <label for="dir_sort">排序</label>
+                <input type="number" name="dir_sort" id="dir_sort" class="text ui-widget-content ui-corner-all">
             </fieldset>
         </form>
     </div>
@@ -92,7 +93,7 @@
     //当前页面的目录父ID
 
     //初始化根目录
-    initDirectoryAndFiles(null);
+    initDirectoryAndFiles(currPid);
     //刷新导航
     refreshNavigation();
 
@@ -124,9 +125,9 @@
                         "<br/>" +
                         "</div>" +
                         "<div class='btnDiv'>" +
-                        "<a class='smallBtn' href=\"javascript:void(0)\" onclick=\"editDirtory(\'" + files[i].id + "\')\">编辑</a>" +
+                        "<a class='smallBtn' href=\"javascript:void(0)\" onclick=\"editDirtory(\'" + dirId + "\')\">编辑</a>" +
                         "&nbsp;" +
-                        "<a class='smallBtn' href=\"javascript:void(0)\" onclick=\"deleteDirtory(\'" + files[i].id + "\')\">删除</a>" +
+                        "<a class='smallBtn' href=\"javascript:void(0)\" onclick=\"deleteDirtory(\'" + dirId + "\')\">删除</a>" +
                         "</div>"
                         + "</div>");
                 }
@@ -145,9 +146,9 @@
                         "<span class='fileName'>" + fileName + "</span>" +
                         "</div>" +
                         "<div class='btnDiv'>" +
-                        "<a class='smallBtn' href=\"javascript:void(0)\" onclick=\"editFile(\'" + files[i].id + "\')\">编辑</a>" +
+                        "<a class='smallBtn' href=\"javascript:void(0)\" onclick=\"editFile(\'" + fileId + "\')\">编辑</a>" +
                         "&nbsp;" +
-                        "<a class='smallBtn' href=\"javascript:void(0)\" onclick=\"deleteFile(\'" + files[i].id + "\')\">删除</a>" +
+                        "<a class='smallBtn' href=\"javascript:void(0)\" onclick=\"deleteFile(\'" + fileId + "\')\">删除</a>" +
                         "</div>"
                         + "</div>");
                 }
@@ -155,17 +156,47 @@
         },null,true);
     }
 
+    /**
+     * 编辑目录详情
+     * @param id
+     */
     function editDirtory(id) {
-        alert(id);
+        common.ajaxDefault($,common.functionUrl.getDirectoryDetail,{"id":id},"GET",
+            function(o){
+                $("#dir_name").val(o.data.name);
+                $("#dir_sort").val(o.data.sort);
+                $("#dir_id").val(o.data.id);
+                floderDialog.dialog("open");
+            });
+
     }
     function deleteDirtory(id) {
-        alert(id);
+        common.ajaxDefault($,common.functionUrl.deleteDirectory,{"id":id},"GET",
+            function(o){
+                alert("删除文件夹成功");
+                initDirectoryAndFiles(currPid);
+            });
     }
     function editFile(id) {
         alert(id);
     }
     function deleteFile(id) {
         alert(id);
+    }
+
+    /**
+     * 添加目录
+     */
+    function addDirectory() {
+        let id = $("#dir_id").val();
+        let name = $("#dir_name").val();
+        let sort = $("#dir_sort").val();
+        common.ajaxObj($,common.functionUrl.saveDirectory,{"id":id,"name":name,"sort":sort,"pid":currPid},"POST",
+            function(o){
+                alert("保存成功");
+                initDirectoryAndFiles(currPid);
+                floderDialog.dialog( "close" );
+            });
     }
 
     /**
@@ -219,50 +250,39 @@
         $('#main').empty();
     }
 
-    $( function() {
-        let floderDialog, form
+    let floderDialog
 
 
-        //更新提示框
-        function updateTips( t ) {
-            tips.text( t ).addClass( "ui-state-highlight" );
-            setTimeout(function() {
-                tips.removeClass( "ui-state-highlight", 1500 );
-            }, 500 );
-        }
-
-        function addUser() {
-            let name = $("#name").val();
-            let sort = $("#sort").val();
-
-           return valid;
-        }
-
-        floderDialog = $("#floder-form").dialog({
-            autoOpen: false,
-            height: 400,
-            width: 350,
-            modal: true,
-            buttons: {
-                "创建": addUser,
-                Cancel: function() {
-                    floderDialog.dialog( "close" );
-                }
-            },
-            close: function() {
-                form[ 0 ].reset();
+    floderDialog = $("#floder-form").dialog({
+        autoOpen: false,
+        height: 400,
+        width: 350,
+        modal: true,
+        buttons: {
+            "保存": addDirectory,
+            "取消": function() {
+                floderDialog.dialog( "close" );
             }
-        });
+        },
+        close: function() {
+            resetDirectoryForm();
+            floderDialog.dialog( "close" );
+        }
+    });
 
-        form = floderDialog.find( "form" ).on( "submit", function( event ) {
-            event.preventDefault();
-            addUser();
-        });
+    /**
+     * 重置目录表单
+     */
+    function resetDirectoryForm() {
+        $("#dir_name").val("");
+        $("#dir_sort").val("");
+        $("#dir_id").val("");
+    }
 
-        $( "#create-floder" ).button().on( "click", function() {
-            floderDialog.dialog( "open" );
-        });
-    } );
+    $( "#create-floder" ).button().on( "click", function() {
+        floderDialog.dialog( "open" );
+    });
+
 
 
 

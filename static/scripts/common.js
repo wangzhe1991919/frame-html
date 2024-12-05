@@ -65,7 +65,12 @@ var common = {
     functionUrl : {
         getListByPid: "/function/directory/getListByPid",
         getFileDetail: "/function/file/getFileDetail",
-        updateFileByType: "/function/file/updateFileByType"
+        updateFileByType: "/function/file/updateFileByType",
+
+
+        saveDirectory: "/function/directory/saveOrUpdate",
+        deleteDirectory: "/function/directory/delete",
+        getDirectoryDetail: "/function/directory/get"
     },
 
     defaultType : [
