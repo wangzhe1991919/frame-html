@@ -1,6 +1,8 @@
-document.write('<script src="/static/jquery/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>');
-document.write('<script src="/static/jquery/jquery.mloading.js" type="text/javascript" charset="utf-8"></script>');
-document.write('<link rel="stylesheet" type="text/css" href="/static/css/jquery.mloading.css">');
+document.write('<script src="../../static/jquery/jquery-3.3.1.min.js" type="text/javascript" charset="utf-8"></script>');
+/*
+document.write('<script src="../../static/jquery/jquery.mloading.js" type="text/javascript" charset="utf-8"></script>');
+document.write('<link rel="stylesheet" type="text/css" href="../../static/css/jquery.mloading.css">');
+*/
 
 
 var common = {
@@ -60,6 +62,16 @@ var common = {
         neoQueryByKeywords: "/neo-query/queryByKeywords",
         neoQueryFileAboutFile: "//neo-query/queryFileAboutFile"
     },
+    functionUrl : {
+        getListByPid: "/function/directory/getListByPid",
+        getFileDetail: "/function/file/getFileDetail",
+        updateFileByType: "/function/file/updateFileByType",
+
+
+        saveDirectory: "/function/directory/saveOrUpdate",
+        deleteDirectory: "/function/directory/delete",
+        getDirectoryDetail: "/function/directory/get"
+    },
 
     defaultType : [
         {"name":"主键","value":0},
@@ -111,7 +123,7 @@ var common = {
         }
 
         if (!hideLoading) {
-            $("body").mLoading("show");
+            /*$("body").mLoading("show");*/
         }
         $.ajax({
             type: type,
@@ -120,16 +132,16 @@ var common = {
             contentType: contentType,
             dataType: 'json',
             success: function(o) {
-                $("body").mLoading("hide");
-                if (o.code == 302) {
+                /*$("body").mLoading("hide");*/
+                if (o.code === 302) {
                     top.window.location.href = common.loginPage;
-                } else if (o.code != 200) {
+                } else if (o.code !== 200) {
                     alert("状态："+ o.code + ",信息：" + o.message);
                 } else {
                     callback(o);
                 }
             },error: function(o) {
-                $("body").mLoading("hide");
+                /*$("body").mLoading("hide");*/
                 alert(o.responseJSON.message);
             }
         });
