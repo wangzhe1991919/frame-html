@@ -6,54 +6,116 @@
     <script src="../static/scripts/common.js"></script>
 </head>
 <style>
-    body{
+    body {
         background-color: #3F3F3F;
+        margin: 0;
+        padding: 0;
+        font-family: "Microsoft YaHei", sans-serif;
     }
-    .btn-div{
+    .btn-div {
+        position: relative;
         float: left;
         border: #F2F2F2 1px dashed;
-        width:18%;
-        height:40px;
-        text-align: center;
+        width: 18%;
+        height: 40px;
         line-height: 40px;
         margin: 3px;
         color: #F2F2F2;
         font-size: 10px;
+        text-align: center;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        padding: 0 10px;
+        box-sizing: border-box;
     }
     .btn-div:hover {
         background-color: #8c8c8c;
         cursor: pointer;
     }
+    .btn-div:hover::after {
+        content: attr(data-title);
+        position: absolute;
+        left: 50%;
+        top: -28px;
+        transform: translateX(-50%);
+        background: rgba(0, 0, 0, 0.75);
+        color: #fff;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 10px;
+        white-space: nowrap;
+        z-index: 10;
+    }
+    .btn-div.dragging {
+        opacity: 0.5;
+    }
+    .btn-div.drag-over {
+        box-shadow: inset 0 0 0 2px #E7F7FF;
+    }
     .group {
         float: left;
-        width:49%;
-        margin-top:10px;
-        /*border: 1px yellow solid;*/
+        width: 49%;
+        margin-top: 10px;
+        min-height: 80px;
     }
-    .group-name{
-        font-size: 20px;
-        color: #333333;
+    .group.dragging {
+        opacity: 0.6;
+    }
+    .group.drag-over {
+        box-shadow: inset 0 0 0 2px #E7F7FF;
+    }
+    .group-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 5px;
+        padding: 4px 8px;
         border-radius: 5px;
         background-color: #8c8c8c;
-        margin: 5px;
-        padding: 2px;
     }
-    .manage-div a{
+    .group-name {
+        font-size: 20px;
+        color: #333333;
+        display: inline-block;
+        cursor: pointer;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 75%;
+    }
+    .group-add-btn, .group-menu-btn {
+        width: 28px;
+        height: 28px;
+        line-height: 28px;
+        border-radius: 50%;
+        background-color: #4476A7;
         color: #F2F2F2;
+        font-size: 22px;
+        font-weight: bold;
+        text-align: center;
+        cursor: pointer;
+        user-select: none;
+        margin-left: 8px;
+    }
+    .group-add-btn:hover, .group-menu-btn:hover {
+        background-color: #2aabd2;
+    }
+    .group-menu-btn {
+        font-size: 18px;
+        line-height: 26px;
     }
 
-    #navigation-div{
-        /*border: 1px solid red;*/
-        width:70%;
+    #navigation-div {
+        width: 70%;
         float: left;
     }
     #note-div {
         width: 29%;
-        /*border: 1px solid yellow;*/
         float: right;
         height: 100%;
     }
-     .note{
+    .note {
         width: 98%;
         overflow: auto;
         word-break: break-all;
@@ -62,7 +124,7 @@
     }
     #note-div button {
         color: #F2F2F2;
-        width:100%;
+        width: 100%;
         height: 40px;
         background-color: #4476A7;
         border: none;
@@ -74,140 +136,774 @@
         cursor: pointer;
     }
     #note-div span {
-        width:100%;
+        width: 100%;
         height: 40px;
-        magin-top:5px;
+        margin-top: 5px;
     }
-    .save-note-create {
-        margin-top:5px;
+    .note-action-row {
+        display: flex;
+        gap: 8px;
+        margin-top: 5px;
+    }
+    .note-action-row button {
+        flex: 1;
+    }
+    .group-action-row {
+        margin-top: 8px;
+    }
+    .group-action-row button {
+        width: 100%;
     }
     .msg {
         color: #4cae4c;
     }
-
     .img-babby {
         width: 70px;
         height: 70px;
-        border:2px solid #afd9ee;
-        border-radius:120px;
-        overflow:hidden;
+        border: 2px solid #afd9ee;
+        border-radius: 120px;
+        overflow: hidden;
         margin-right: 40px;
         float: left;
         box-shadow: 8px 8px 8px black;
     }
-    .img-babby img{
+    .img-babby img {
         height: 100%;
-    }
-
-    .manage-div{
-        float: left;
-        height: 80px;
-        width: 70%;
-        /*border: #00FF00 1px solid;*/
     }
     .config-btn {
         float: right;
         margin: 10px 10px;
-        /*border: red 1px solid;*/
     }
-    .config-btn a{
+    .config-btn a {
         color: #5e5e5e;
     }
-
-
-
+    #nav-editor {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+    }
+    #nav-editor.show {
+        display: block;
+    }
+    .nav-editor-panel {
+        width: 420px;
+        margin: 80px auto 0;
+        background: #f2f2f2;
+        border-radius: 8px;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+    .nav-editor-panel h3 {
+        margin-top: 0;
+        color: #333;
+    }
+    .nav-form-item {
+        margin-bottom: 12px;
+    }
+    .nav-form-item label {
+        display: inline-block;
+        width: 90px;
+        color: #555;
+    }
+    .nav-form-item input,
+    .nav-form-item select,
+    .nav-form-item textarea {
+        width: 260px;
+        padding: 6px 8px;
+        box-sizing: border-box;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+    .nav-form-item textarea {
+        height: 80px;
+        resize: vertical;
+    }
+    .nav-form-item .radio-inline {
+        width: auto;
+        margin-right: 20px;
+    }
+    .nav-form-item input[type="radio"] {
+        width: auto;
+        margin-right: 5px;
+    }
+    .nav-editor-actions {
+        margin-top: 20px;
+        text-align: right;
+    }
+    .nav-editor-actions button {
+        border: none;
+        padding: 8px 14px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-left: 10px;
+        color: #fff;
+    }
+    .nav-editor-actions .nav-save-btn {
+        background-color: #4476A7;
+    }
+    .nav-editor-actions .nav-cancel-btn {
+        background-color: #7d7d7d;
+    }
+    .nav-manager-tools {
+        margin-top: 15px;
+    }
+    .nav-manager-tools button {
+        background-color: #4476A7;
+        border: none;
+        color: #F2F2F2;
+        border-radius: 5px;
+        padding: 8px 12px;
+        cursor: pointer;
+        margin-right: 10px;
+    }
+    .nav-manager-tools button:hover {
+        background-color: #2aabd2;
+    }
+    .group-modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1100;
+    }
+    .group-modal.show {
+        display: block;
+    }
+    .group-modal-panel {
+        width: 360px;
+        margin: 120px auto 0;
+        background: #f2f2f2;
+        border-radius: 8px;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+    .group-modal-panel h3 {
+        margin-top: 0;
+        color: #333;
+    }
+    .group-form-item {
+        margin-bottom: 12px;
+    }
+    .group-form-item label {
+        display: inline-block;
+        width: 70px;
+        color: #555;
+    }
+    .group-form-item input {
+        width: 220px;
+        padding: 6px 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+    .group-modal-actions {
+        margin-top: 20px;
+        text-align: right;
+    }
+    .group-modal-actions button {
+        border: none;
+        padding: 8px 14px;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-left: 10px;
+        color: #fff;
+    }
+    .group-modal-actions .group-save-btn {
+        background-color: #4476A7;
+    }
+    .group-modal-actions .group-cancel-btn {
+        background-color: #7d7d7d;
+    }
 </style>
 <body>
-
-    <div class="manage-div">
-        <div class="img-babby"><img src="http://47.101.47.106/staticFile/miaomiao/1.png"></div>
-        <div class="img-babby"><img src="http://47.101.47.106/staticFile/miaomiao/2.png"></div>
-        <div class="img-babby"><img src="http://47.101.47.106/staticFile/miaomiao/3.png"></div>
-        <div class="img-babby"><img src="http://47.101.47.106/staticFile/miaomiao/4.png"></div>
-        <div class="img-babby"><img src="http://47.101.47.106/staticFile/miaomiao/5.png"></div>
-        <div class="img-babby"><img src="http://47.101.47.106/staticFile/miaomiao/6.png"></div>
-        <div class="img-babby"><img src="http://47.101.47.106/staticFile/miaomiao/7.png"></div>
-        <div class="img-babby"><img src="http://47.101.47.106/staticFile/miaomiao/8.png"></div>
-
-        <div class="config-btn">
-            <a href="groupList.html">导航分组管理</a>
-            <br/><br/>
-            <a href="list.html">导航列表管理</a>
-        </div>
-
-    </div>
 
     <div id="note-div">
         <input type="hidden" id="note-id"/>
         <textarea onblur="autoSaveNote()" class="note"></textarea>
-        <button class="save-note">保存</button>
-        <button class="save-note-create">保存并新建</button>
+        <div class="note-action-row">
+            <button class="save-note">保存</button>
+            <button class="save-note-create">保存并新建</button>
+        </div>
+        <div class="group-action-row">
+            <button id="add-group-btn">新增分组</button>
+        </div>
         <span class="msg"></span>
     </div>
 
     <div id="navigation-div"></div>
 
+    <div id="nav-editor">
+        <div class="nav-editor-panel">
+            <h3 id="nav-editor-title">编辑导航</h3>
+            <input type="hidden" id="nav-id" />
+            <div class="nav-form-item">
+                <label>所属分组</label>
+                <select id="nav-group"></select>
+            </div>
+            <div class="nav-form-item">
+                <label>名称</label>
+                <input type="text" id="nav-name" />
+            </div>
+            <div class="nav-form-item">
+                <label>链接</label>
+                <input type="text" id="nav-url" />
+            </div>
+            <div class="nav-form-item">
+                <label>排序</label>
+                <input type="number" id="nav-sort" min="1" />
+            </div>
+            <div class="nav-form-item">
+                <label>新窗口</label>
+                <label class="radio-inline"><input type="radio" name="nav-opennew" value="1" /> 是</label>
+                <label class="radio-inline"><input type="radio" name="nav-opennew" value="0" /> 否</label>
+            </div>
+            <div class="nav-form-item">
+                <label>备注</label>
+                <textarea id="nav-remark"></textarea>
+            </div>
+            <div class="nav-editor-actions">
+                <button class="nav-save-btn" id="nav-save-btn">保存</button>
+                <button class="nav-cancel-btn" id="nav-cancel-btn">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="group-modal" class="group-modal">
+        <div class="group-modal-panel">
+            <h3 id="group-modal-title">分组</h3>
+            <input type="hidden" id="group-id" />
+            <div class="group-form-item">
+                <label>名称</label>
+                <input type="text" id="group-name" />
+            </div>
+            <div class="group-form-item">
+                <label>排序</label>
+                <input type="number" id="group-sort" min="1" />
+            </div>
+            <div class="group-modal-actions">
+                <button class="group-save-btn" id="group-save-btn">保存</button>
+                <button class="group-cancel-btn" id="group-cancel-btn">取消</button>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>
 <script>
 
     var noteStr = null;
+    var navigationMap = {};
+    var navGroupMap = {};
+    var dragNavigationId = null;
+    var dragGroupId = null;
+    var contextMenuTimer = null;
 
     initNavigationData();
     initNoteData();
+    loadNavigationGroups();
 
-    //保存按钮添加事件
     $(".save-note").click(saveNote);
-
-    //保存并新建按钮添加事件
     $(".save-note-create").click(saveNoteCreate);
+    $("#add-group-btn").click(function(){ openGroupEditor(); });
+    $("#nav-save-btn").click(saveNavigationForm);
+    $("#nav-cancel-btn").click(function(){ $("#nav-editor").removeClass("show"); });
+    $("#group-save-btn").click(saveGroupForm);
+    $("#group-cancel-btn").click(function(){ $("#group-modal").removeClass("show"); });
+    $(document).on("click", function(e) {
+        if (!$(e.target).closest(".nav-context-menu").length) {
+            $(".nav-context-menu").remove();
+        }
+        if (!$(e.target).closest(".group-context-menu").length) {
+            $(".group-context-menu").remove();
+        }
+    });
 
-    //加载导航数据
-    function initNavigationData() {
-        common.ajaxObj($,common.url.listNavigationIndex,null,"POST",function(o){
-            const data = o.data;
+    function escapeHtml(str) {
+        if (str === null || str === undefined) {
+            return "";
+        }
+        return String(str)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/\"/g, "&quot;")
+            .replace(/'/g, "&#39;");
+    }
+
+    function loadNavigationGroups() {
+        common.ajaxObj($, common.url.listNavigationGroup, null, "POST", function(o) {
+            const data = o.data || [];
+            navGroupMap = {};
+            $("#nav-group").empty();
             for (let i = 0; i < data.length; i++) {
-                const navigation = data[i].navigationVOList;
-                //向上取整
-                //var height = Math.ceil(navigation.length/6) * 100;
+                navGroupMap[data[i].id] = data[i].name;
+                $("#nav-group").append("<option value='" + data[i].id + "'>" + escapeHtml(data[i].name) + "</option>");
+            }
+            if (Object.keys(navGroupMap).length > 0) {
+                $("#nav-group").val(Object.keys(navGroupMap)[0]);
+            }
+        }, null, true);
+    }
+
+    function initNavigationData() {
+        common.ajaxObj($, common.url.listNavigationIndex, null, "POST", function(o) {
+            $("#navigation-div").empty();
+            navigationMap = {};
+            const data = o.data || [];
+            for (let i = 0; i < data.length; i++) {
+                const groupId = data[i].groupId;
+                const navigation = data[i].navigationVOList || [];
                 $("#navigation-div").append(
-                    "<div class='group' id='"+ data[i].groupId + "' style='height:100%;'>" +
-                    "   <div><span class='group-name'>" + data[i].groupName + "</span></div>");
+                    "<div class='group' id='" + groupId + "' data-group-id='" + groupId + "' data-sort='" + (data[i].sort || (i + 1)) + "' draggable='true'>" +
+                    "   <div class='group-header'>" +
+                    "       <span class='group-name' data-group-id='" + groupId + "' title='" + escapeHtml(data[i].groupName || '') + "'>" + escapeHtml(data[i].groupName) + "</span>" +
+                    "       <div style='display:flex;align-items:center;'>" +
+                    "           <span class='group-add-btn' title='新增按钮' data-group-id='" + groupId + "'>+</span>" +
+                    "           <span class='group-menu-btn' title='分组菜单' data-group-id='" + groupId + "'>⋯</span>" +
+                    "       </div>" +
+                    "   </div>" +
+                    "</div>"
+                );
                 for (let j = 0; j < navigation.length; j++) {
-                    $("#" + data[i].groupId).append("" +
-                        "<div class='btn-div' data-url='"+navigation[j].url+"'>" + navigation[j].name + "</div>" +
-                    "</div>");
+                    const navigationItem = navigation[j];
+                    navigationItem.groupId = groupId;
+                    navigationMap[navigationItem.id] = navigationItem;
+                    $("#" + groupId).append(
+                        "<div class='btn-div' data-id='" + navigationItem.id + "' data-title='" + escapeHtml(navigationItem.name || '') + "' draggable='true' title='" + escapeHtml(navigationItem.name || '') + "'>" +
+                        "   <span class='btn-text'>" + escapeHtml(navigationItem.name) + "</span>" +
+                        "</div>"
+                    );
                 }
             }
-            $(".btn-div").click(function(){
-                let url = this.dataset.url;
-                window.open(url);
+            bindNavigationBehavior();
+        }, null, true);
+    }
+
+    function bindNavigationBehavior() {
+        $(".btn-div").off("click contextmenu dragstart dragover dragleave drop");
+        $(".group").off("dragstart dragover dragleave drop");
+        $(".group-add-btn").off("click").on("click", function() {
+            openNavigationEditor(null, $(this).data("group-id"));
+        });
+        $(".group-menu-btn").off("click").on("click", function(e) {
+            e.stopPropagation();
+            showGroupContextMenu(this, $(this).data("group-id"), e);
+        });
+        $(".group-name").off("contextmenu").on("contextmenu", function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            showGroupContextMenu(this, $(this).data("group-id"), e);
+        });
+
+        $(".group").on("dragstart", function(e) {
+            dragGroupId = $(this).data("group-id");
+            $(this).addClass("dragging");
+            e.originalEvent.dataTransfer.effectAllowed = "move";
+            e.originalEvent.dataTransfer.setData("text/plain", dragGroupId);
+        });
+
+        $(".group").on("dragend", function() {
+            $(this).removeClass("dragging");
+            $(".group").removeClass("drag-over");
+            dragGroupId = null;
+        });
+
+        $(".group").on("dragover", function(e) {
+            e.preventDefault();
+            if (dragGroupId !== null && dragGroupId !== $(this).data("group-id")) {
+                $(this).addClass("drag-over");
+            }
+        });
+
+        $(".group").on("dragleave", function() {
+            $(this).removeClass("drag-over");
+        });
+
+        $(".group").on("drop", function(e) {
+            e.preventDefault();
+            $(this).removeClass("drag-over");
+            const targetGroupId = $(this).data("group-id");
+            reorderGroups(dragGroupId, targetGroupId);
+        });
+
+        $(".btn-div").on("click", function(e) {
+            $(".nav-context-menu").remove();
+            const id = $(this).data("id");
+            const item = navigationMap[id];
+            if (item && item.url) {
+                window.open(item.url);
+            }
+        });
+
+        $(".btn-div").on("contextmenu", function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            $(".nav-context-menu").remove();
+            const menu = $(
+                "<div class='nav-context-menu' style='position:fixed;left:" + e.clientX + "px;top:" + e.clientY + "px;z-index:2000;background:#f2f2f2;border:1px solid #d8d8d8;border-radius:5px;box-shadow:0 2px 8px rgba(0,0,0,0.25);padding:6px 0;min-width:110px;'>" +
+                "   <div data-action='edit' data-id='" + $(this).data("id") + "' style='padding:8px 14px;cursor:pointer;color:#333;'>编辑</div>" +
+                "   <div data-action='delete' data-id='" + $(this).data("id") + "' style='padding:8px 14px;cursor:pointer;color:#333;border-top:1px solid #e8e8e8;'>删除</div>" +
+                "</div>"
+            );
+            $("body").append(menu);
+            menu.find("[data-action='edit']").on("click", function() {
+                openNavigationEditor($(this).data("id"));
+                menu.remove();
             });
-        },null,true);
+            menu.find("[data-action='delete']").on("click", function() {
+                deleteNavigation($(this).data("id"));
+                menu.remove();
+            });
+        });
+
+        $(".btn-div").on("dragstart", function(e) {
+            dragNavigationId = $(this).data("id");
+            $(this).addClass("dragging");
+            e.originalEvent.dataTransfer.effectAllowed = "move";
+            e.originalEvent.dataTransfer.setData("text/plain", dragNavigationId);
+        });
+
+        $(".btn-div").on("dragend", function() {
+            $(this).removeClass("dragging");
+            $(".btn-div").removeClass("drag-over");
+            dragNavigationId = null;
+        });
+
+        $(".btn-div").on("dragover", function(e) {
+            e.preventDefault();
+            if (dragNavigationId !== null && dragNavigationId !== $(this).data("id")) {
+                $(this).addClass("drag-over");
+            }
+        });
+
+        $(".btn-div").on("dragleave", function() {
+            $(this).removeClass("drag-over");
+        });
+
+        $(".btn-div").on("drop", function(e) {
+            e.preventDefault();
+            $(this).removeClass("drag-over");
+            const targetId = $(this).data("id");
+            dropNavigation(dragNavigationId, targetId);
+        });
+    }
+
+    function dropNavigation(sourceId, targetId) {
+        if (!sourceId || !targetId || sourceId === targetId) {
+            return;
+        }
+        const source = navigationMap[sourceId];
+        const target = navigationMap[targetId];
+        if (!source || !target || source.groupId !== target.groupId) {
+            return;
+        }
+        const $group = $("#" + source.groupId);
+        const $source = $group.find(".btn-div[data-id='" + sourceId + "']");
+        const $target = $group.find(".btn-div[data-id='" + targetId + "']");
+        if ($source.length === 0 || $target.length === 0) {
+            return;
+        }
+        const sourceIndex = $group.find(".btn-div").index($source);
+        const targetIndex = $group.find(".btn-div").index($target);
+        if (sourceIndex < targetIndex) {
+            $target.after($source);
+        } else {
+            $target.before($source);
+        }
+        saveSortOrder(source.groupId);
+    }
+
+    function reorderGroups(sourceGroupId, targetGroupId) {
+        if (!sourceGroupId || !targetGroupId || sourceGroupId === targetGroupId) {
+            return;
+        }
+        const $source = $("#" + sourceGroupId);
+        const $target = $("#" + targetGroupId);
+        if ($source.length === 0 || $target.length === 0) {
+            return;
+        }
+        const sourceIndex = $(".group").index($source);
+        const targetIndex = $(".group").index($target);
+        if (sourceIndex < targetIndex) {
+            $target.after($source);
+        } else {
+            $target.before($source);
+        }
+        saveGroupSortOrder();
+    }
+
+    function saveGroupSortOrder() {
+        const groups = $(".group").map(function() {
+            return { id: $(this).data("group-id"), name: $(this).find(".group-name").text() };
+        }).get();
+
+        for (let i = 0; i < groups.length; i++) {
+            const item = groups[i];
+            if (!item || !item.id) {
+                continue;
+            }
+            common.ajaxObj($, common.url.updateSysNavigationGroup, {
+                id: item.id,
+                name: item.name,
+                sort: i + 1
+            }, "POST", function(o) {
+                $(".msg").html("分组排序已保存，更新时间：" + new Date().toLocaleTimeString());
+            }, null, true);
+        }
+    }
+
+    function saveSortOrder(groupId) {
+        const $group = $("#" + groupId);
+        if ($group.length === 0) {
+            return;
+        }
+        const order = $group.find(".btn-div").map(function() {
+            return $(this).data("id");
+        }).get();
+        for (let i = 0; i < order.length; i++) {
+            const navigationItem = navigationMap[order[i]];
+            if (!navigationItem) {
+                continue;
+            }
+            navigationItem.sort = i + 1;
+            common.ajaxObj($, common.url.updateSysNavigation, {
+                id: navigationItem.id,
+                groupId: navigationItem.groupId,
+                name: navigationItem.name,
+                url: navigationItem.url,
+                sort: navigationItem.sort,
+                opennew: navigationItem.opennew || 0,
+                remark: navigationItem.remark || ""
+            }, "POST", function(o) {
+                $(".msg").html("排序已保存，更新时间：" + new Date().toLocaleTimeString());
+            }, null, true);
+        }
+    }
+
+    function openNavigationEditor(id, defaultGroupId) {
+        if (!Object.keys(navGroupMap).length) {
+            loadNavigationGroups();
+        }
+        $("#nav-editor").addClass("show");
+        $("#nav-id").val("");
+        $("#nav-name").val("");
+        $("#nav-url").val("");
+        $("#nav-sort").val(1);
+        $("#nav-remark").val("");
+        $("input[name='nav-opennew'][value='0']").prop("checked", true);
+
+        if (id) {
+            const item = navigationMap[id];
+            if (!item) {
+                return;
+            }
+            $("#nav-editor-title").text("编辑导航");
+            $("#nav-id").val(item.id);
+            $("#nav-group").val(item.groupId);
+            $("#nav-name").val(item.name);
+            $("#nav-url").val(item.url);
+            $("#nav-sort").val(item.sort || 1);
+            $("input[name='nav-opennew'][value='" + (item.opennew || 0) + "']").prop("checked", true);
+            $("#nav-remark").val(item.remark || "");
+            return;
+        }
+
+        $("#nav-editor-title").text("新增导航");
+        const targetGroupId = defaultGroupId || Object.keys(navGroupMap)[0];
+        if (targetGroupId) {
+            $("#nav-group").val(targetGroupId);
+        }
+        const currentGroupId = $("#nav-group").val();
+        if (currentGroupId) {
+            const groupButtons = $("#" + currentGroupId).find(".btn-div");
+            $("#nav-sort").val(groupButtons.length + 1);
+        }
+    }
+
+    function showGroupContextMenu(dom, groupId, event) {
+        $(".group-context-menu").remove();
+        const x = event ? event.clientX : 0;
+        const y = event ? event.clientY : 0;
+        const menu = $(
+            "<div class='group-context-menu' style='position:fixed;left:" + x + "px;top:" + y + "px;z-index:2000;background:#f2f2f2;border:1px solid #d8d8d8;border-radius:5px;box-shadow:0 2px 8px rgba(0,0,0,0.25);padding:6px 0;min-width:120px;'>" +
+            "   <div data-action='editGroup' data-group-id='" + groupId + "' style='padding:8px 14px;cursor:pointer;color:#333;'>编辑分组</div>" +
+            "   <div data-action='deleteGroup' data-group-id='" + groupId + "' style='padding:8px 14px;cursor:pointer;color:#333;border-top:1px solid #e8e8e8;'>删除分组</div>" +
+            "</div>"
+        );
+        $("body").append(menu);
+        menu.find("[data-action='editGroup']").on("click", function() {
+            openGroupEditor(groupId);
+            menu.remove();
+        });
+        menu.find("[data-action='deleteGroup']").on("click", function() {
+            deleteGroup(groupId);
+            menu.remove();
+        });
+    }
+
+    function openGroupEditor(id) {
+        $("#group-modal").addClass("show");
+        $("#group-id").val("");
+        $("#group-name").val("");
+        $("#group-sort").val(1);
+        if (id) {
+            const group = Object.keys(navGroupMap).map(function(key){return {id:key,name:navGroupMap[key]};}).find(function(item){return item.id === id;});
+            if (!group) { return; }
+            $("#group-modal-title").text("编辑分组");
+            $("#group-id").val(group.id);
+            $("#group-name").val(group.name);
+            const groupSort = $("#" + group.id).data("sort") || 1;
+            $("#group-sort").val(groupSort);
+            return;
+        }
+        $("#group-modal-title").text("新增分组");
+        const groupCount = $(".group").length;
+        $("#group-sort").val(groupCount + 1);
+    }
+
+    function saveGroupForm() {
+        const id = $("#group-id").val();
+        const name = $("#group-name").val();
+        const sort = $("#group-sort").val();
+        if (!name || !sort) {
+            alert("分组名称和排序不能为空");
+            return;
+        }
+        const param = {name: name, sort: Number(sort)};
+        if (id) {
+            param.id = id;
+            common.ajaxObj($, common.url.updateSysNavigationGroup, param, "POST", function(o) {
+                $("#group-modal").removeClass("show");
+                initNavigationData();
+                loadNavigationGroups();
+            }, null, true);
+            return;
+        }
+        common.ajaxObj($, common.url.insertSysNavigationGroup, param, "POST", function(o) {
+            $("#group-modal").removeClass("show");
+            initNavigationData();
+            loadNavigationGroups();
+        }, null, true);
+    }
+
+    function deleteGroup(groupId) {
+        if (!groupId || !confirm("确定删除该分组及其下所有按钮吗？")) {
+            return;
+        }
+        const groupItems = Object.keys(navigationMap).filter(function(key) {
+            return navigationMap[key].groupId === groupId;
+        }).map(function(key) { return navigationMap[key]; });
+        if (groupItems.length > 0) {
+            deleteGroupItems(groupItems, 0, function() {
+                common.ajaxDefault($, common.url.deleteNavigationGroup, {id: groupId}, "DELETE", function(o) {
+                    initNavigationData();
+                    loadNavigationGroups();
+                    $(".msg").html("分组删除成功：" + new Date().toLocaleTimeString());
+                }, true);
+            });
+            return;
+        }
+        common.ajaxDefault($, common.url.deleteNavigationGroup, {id: groupId}, "DELETE", function(o) {
+            initNavigationData();
+            loadNavigationGroups();
+            $(".msg").html("分组删除成功：" + new Date().toLocaleTimeString());
+        }, true);
+    }
+
+    function deleteGroupItems(groupItems, index, callback) {
+        if (index >= groupItems.length) {
+            callback();
+            return;
+        }
+        const item = groupItems[index];
+        common.ajaxDefault($, common.url.deleteNavigation, {id: item.id}, "DELETE", function() {
+            delete navigationMap[item.id];
+            deleteGroupItems(groupItems, index + 1, callback);
+        }, true);
+    }
+
+    function saveNavigationForm() {
+        const id = $("#nav-id").val();
+        const groupId = $("#nav-group").val();
+        const name = $("#nav-name").val();
+        const url = $("#nav-url").val();
+        const sort = $("#nav-sort").val();
+        const opennew = $("input[name='nav-opennew']:checked").val();
+        const remark = $("#nav-remark").val();
+
+        if (!groupId || !name || !url || !sort) {
+            alert("请填写必填项");
+            return;
+        }
+
+        const param = {
+            groupId: groupId,
+            name: name,
+            url: url,
+            sort: Number(sort),
+            opennew: Number(opennew || 0),
+            remark: remark || ""
+        };
+
+        if (id) {
+            param.id = id;
+            common.ajaxObj($, common.url.updateSysNavigation, param, "POST", function(o) {
+                $("#nav-editor").removeClass("show");
+                initNavigationData();
+            }, null, true);
+            return;
+        }
+
+        common.ajaxObj($, common.url.insertSysNavigation, param, "POST", function(o) {
+            $("#nav-editor").removeClass("show");
+            initNavigationData();
+        }, null, true);
+    }
+
+    function deleteNavigation(id) {
+        if (!id || !confirm("确定删除这个导航按钮吗？")) {
+            return;
+        }
+        common.ajaxDefault($, common.url.deleteNavigation, {id: id}, "DELETE", function(o) {
+            const item = navigationMap[id];
+            if (item) {
+                $("#" + item.groupId).find(".btn-div[data-id='" + id + "']").remove();
+                delete navigationMap[id];
+                saveSortOrder(item.groupId);
+            }
+            $(".msg").html("删除成功：" + new Date().toLocaleTimeString());
+        }, true);
     }
 
     ////加载笔记数据
     function initNoteData () {
-        common.ajaxObj($,common.url.getNote,null,"GET",function (o) {
-            const data = o.data;
-            $("#note-id").val(data.id);
-            $(".note").val(data.content);
-            noteStr = data.content;
-        },null,true)
+        common.ajaxObj($, common.url.getNote, null, "GET", function (o) {
+            const data = o.data || {};
+            $("#note-id").val(data.id || "");
+            $(".note").val(data.content || "");
+            noteStr = data.content || "";
+        }, null, true)
     }
 
     //保存笔记
     function saveNote(url) {
-        common.ajaxObj($,common.url.insertNote,{id:$("#note-id").val(),content:$(".note").val()},"POST",function (o) {
+        common.ajaxObj($, common.url.insertNote, {id: $("#note-id").val(), content: $(".note").val()}, "POST", function (o) {
             $(".msg").html("最近保存成功时间：" + o.data);
             initNoteData();
-        },null,true);
+        }, null, true);
     }
 
     //保存并新建笔记
     function saveNoteCreate() {
-        common.ajaxObj($,common.url.insertNoteCreate,{id:$("#note-id").val(),content:$(".note").val()},"POST",function (o) {
+        common.ajaxObj($, common.url.insertNoteCreate, {id: $("#note-id").val(), content: $(".note").val()}, "POST", function (o) {
             $(".msg").html("保存并新建成功：" + o.data);
             initNoteData();
         });
@@ -217,9 +913,7 @@
      * 自动存储笔记
      */
     function autoSaveNote() {
-        //现在最新的笔记内容
         var currNoteStr = $(".note").val();
-        //和原有的笔记数据进行对比，如果不一致，则自动保存
         if (noteStr != currNoteStr) {
             saveNote();
         }
@@ -233,7 +927,6 @@
         setNoteheight();
     }
 
-    //根据浏览器高度设置笔记高度
     window.onresize = setNoteheight;
 
 </script>
