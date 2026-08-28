@@ -7,31 +7,37 @@
 </head>
 <style>
     body {
-        background-color: #3F3F3F;
+        background: linear-gradient(180deg, #2f2f2f 0%, #3a3a3a 100%);
         margin: 0;
         padding: 0;
         font-family: "Microsoft YaHei", sans-serif;
+        color: #ebebeb;
     }
     .btn-div {
         position: relative;
         float: left;
-        border: #F2F2F2 1px dashed;
+        border: 1px solid rgba(255,255,255,0.18);
+        background: rgba(255,255,255,0.06);
         width: 18%;
-        min-height: 40px;
+        height: 52px;
         line-height: 16px;
         margin: 3px;
-        color: #F2F2F2;
+        color: #f4f4f4;
         font-size: 10px;
         text-align: center;
-        padding: 10px 6px 8px;
+        padding: 6px 4px;
         box-sizing: border-box;
         display: flex;
         align-items: center;
         justify-content: center;
         overflow: hidden;
+        border-radius: 6px;
+        box-shadow: 0 1px 0 rgba(255,255,255,0.08), inset 0 1px 0 rgba(255,255,255,0.04);
+        transition: all 0.2s ease;
     }
     .btn-div:hover {
-        background-color: #8c8c8c;
+        background: rgba(255,255,255,0.12);
+        border-color: rgba(255,255,255,0.25);
         cursor: pointer;
     }
     .btn-div .btn-text {
@@ -43,60 +49,97 @@
         white-space: normal;
         text-align: center;
         letter-spacing: 0.02em;
+        font-size: 10px;
+        transform: scale(0.96);
+        transform-origin: center;
     }
     .btn-div.dragging {
         opacity: 0.5;
     }
     .btn-div.drag-over {
-        box-shadow: inset 0 0 0 2px #E7F7FF;
+        box-shadow: inset 0 0 0 2px rgba(255,255,255,0.35);
     }
     .group {
         float: left;
         width: 49%;
         margin-top: 10px;
         min-height: 80px;
+        padding: 0 4px 8px;
+        box-sizing: border-box;
     }
     .group.dragging {
         opacity: 0.6;
     }
     .group.drag-over {
-        box-shadow: inset 0 0 0 2px #E7F7FF;
+        box-shadow: inset 0 0 0 2px rgba(255,255,255,0.35);
+        border-radius: 8px;
     }
     .group-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin: 5px;
-        padding: 4px 8px;
-        border-radius: 5px;
-        background-color: #8c8c8c;
+        margin: 5px 0 8px;
+        padding: 8px 12px;
+        border-radius: 8px;
+        background: rgba(255,255,255,0.1);
+        border: 1px solid rgba(255,255,255,0.1);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.06);
+        width: 100%;
+        box-sizing: border-box;
+    }
+    .group-title-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        min-width: 0;
     }
     .group-name {
         font-size: 20px;
-        color: #333333;
+        color: #f1f1f1;
         display: inline-block;
         cursor: pointer;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: 75%;
+        letter-spacing: 0.04em;
+        flex: 1;
+    }
+    .group-actions {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        gap: 8px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+        min-width: 72px;
+    }
+    .group-header:hover .group-actions,
+    .group-header:focus-within .group-actions,
+    .group-header.active .group-actions {
+        opacity: 1;
+        pointer-events: auto;
     }
     .group-add-btn, .group-menu-btn {
         width: 28px;
         height: 28px;
         line-height: 28px;
         border-radius: 50%;
-        background-color: #4476A7;
-        color: #F2F2F2;
+        background: rgba(255,255,255,0.12);
+        border: 1px solid rgba(255,255,255,0.16);
+        color: #f2f2f2;
         font-size: 22px;
-        font-weight: bold;
+        font-weight: 500;
         text-align: center;
         cursor: pointer;
         user-select: none;
-        margin-left: 8px;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
     }
     .group-add-btn:hover, .group-menu-btn:hover {
-        background-color: #2aabd2;
+        background: rgba(255,255,255,0.18);
     }
     .group-menu-btn {
         font-size: 18px;
@@ -111,25 +154,37 @@
         width: 29%;
         float: right;
         height: 100%;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.09);
+        border-radius: 10px;
+        padding: 12px;
+        box-sizing: border-box;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
     }
     .note {
         width: 98%;
         overflow: auto;
         word-break: break-all;
-        background-color: #696969;
-        color: #f2f2f2;
+        background: rgba(255,255,255,0.06);
+        color: #f7f7f7;
+        border: 1px solid rgba(255,255,255,0.08);
+        border-radius: 8px;
+        padding: 10px;
+        box-sizing: border-box;
+        resize: none;
     }
     #note-div button {
         color: #F2F2F2;
         width: 100%;
         height: 40px;
-        background-color: #4476A7;
-        border: none;
-        border-radius: 5px;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 6px;
         cursor: pointer;
+        transition: all 0.2s ease;
     }
     #note-div button:hover {
-        background-color: #2aabd2;
+        background: rgba(255,255,255,0.14);
         cursor: pointer;
     }
     #note-div span {
@@ -152,7 +207,9 @@
         width: 100%;
     }
     .msg {
-        color: #4cae4c;
+        color: #00FF00;
+        display: inline-block;
+        margin-top: 8px;
     }
     .img-babby {
         width: 70px;
@@ -190,14 +247,16 @@
     .nav-editor-panel {
         width: 420px;
         margin: 80px auto 0;
-        background: #f2f2f2;
+        background: rgba(50,50,50,0.92);
+        border: 1px solid rgba(255,255,255,0.12);
         border-radius: 8px;
         padding: 20px;
         box-sizing: border-box;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
     }
     .nav-editor-panel h3 {
         margin-top: 0;
-        color: #333;
+        color: #f1f1f1;
     }
     .nav-form-item {
         margin-bottom: 12px;
@@ -205,7 +264,7 @@
     .nav-form-item label {
         display: inline-block;
         width: 90px;
-        color: #555;
+        color: #e5e5e5;
     }
     .nav-form-item input,
     .nav-form-item select,
@@ -213,7 +272,9 @@
         width: 260px;
         padding: 6px 8px;
         box-sizing: border-box;
-        border: 1px solid #ccc;
+        border: 1px solid rgba(255,255,255,0.1);
+        background: rgba(255,255,255,0.05);
+        color: #fff;
         border-radius: 4px;
     }
     .nav-form-item textarea {
@@ -223,6 +284,7 @@
     .nav-form-item .radio-inline {
         width: auto;
         margin-right: 20px;
+        color: #f0f0f0;
     }
     .nav-form-item input[type="radio"] {
         width: auto;
@@ -233,25 +295,26 @@
         text-align: right;
     }
     .nav-editor-actions button {
-        border: none;
+        border: 1px solid rgba(255,255,255,0.12);
         padding: 8px 14px;
         border-radius: 5px;
         cursor: pointer;
         margin-left: 10px;
         color: #fff;
+        background: rgba(255,255,255,0.06);
     }
     .nav-editor-actions .nav-save-btn {
-        background-color: #4476A7;
+        background: rgba(255,255,255,0.12);
     }
     .nav-editor-actions .nav-cancel-btn {
-        background-color: #7d7d7d;
+        background: rgba(255,255,255,0.05);
     }
     .nav-manager-tools {
         margin-top: 15px;
     }
     .nav-manager-tools button {
-        background-color: #4476A7;
-        border: none;
+        background: rgba(255,255,255,0.08);
+        border: 1px solid rgba(255,255,255,0.12);
         color: #F2F2F2;
         border-radius: 5px;
         padding: 8px 12px;
@@ -259,7 +322,7 @@
         margin-right: 10px;
     }
     .nav-manager-tools button:hover {
-        background-color: #2aabd2;
+        background: rgba(255,255,255,0.14);
     }
     .group-modal {
         display: none;
@@ -277,14 +340,16 @@
     .group-modal-panel {
         width: 360px;
         margin: 120px auto 0;
-        background: #f2f2f2;
+        background: rgba(50,50,50,0.92);
+        border: 1px solid rgba(255,255,255,0.12);
         border-radius: 8px;
         padding: 20px;
         box-sizing: border-box;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.2);
     }
     .group-modal-panel h3 {
         margin-top: 0;
-        color: #333;
+        color: #f1f1f1;
     }
     .group-form-item {
         margin-bottom: 12px;
@@ -292,12 +357,14 @@
     .group-form-item label {
         display: inline-block;
         width: 70px;
-        color: #555;
+        color: #e5e5e5;
     }
     .group-form-item input {
         width: 220px;
         padding: 6px 8px;
-        border: 1px solid #ccc;
+        border: 1px solid rgba(255,255,255,0.1);
+        background: rgba(255,255,255,0.05);
+        color: #fff;
         border-radius: 4px;
         box-sizing: border-box;
     }
@@ -306,18 +373,19 @@
         text-align: right;
     }
     .group-modal-actions button {
-        border: none;
+        border: 1px solid rgba(255,255,255,0.12);
         padding: 8px 14px;
         border-radius: 5px;
         cursor: pointer;
         margin-left: 10px;
         color: #fff;
+        background: rgba(255,255,255,0.06);
     }
     .group-modal-actions .group-save-btn {
-        background-color: #4476A7;
+        background: rgba(255,255,255,0.12);
     }
     .group-modal-actions .group-cancel-btn {
-        background-color: #7d7d7d;
+        background: rgba(255,255,255,0.05);
     }
 </style>
 <body>
@@ -461,10 +529,12 @@
                 $("#navigation-div").append(
                     "<div class='group' id='" + groupId + "' data-group-id='" + groupId + "' data-sort='" + (data[i].sort || (i + 1)) + "' draggable='true'>" +
                     "   <div class='group-header'>" +
-                    "       <span class='group-name' data-group-id='" + groupId + "' title='" + escapeHtml(data[i].groupName || '') + "'>" + escapeHtml(data[i].groupName) + "</span>" +
-                    "       <div style='display:flex;align-items:center;'>" +
-                    "           <span class='group-add-btn' title='新增按钮' data-group-id='" + groupId + "'>+</span>" +
-                    "           <span class='group-menu-btn' title='分组菜单' data-group-id='" + groupId + "'>⋯</span>" +
+                    "       <div class='group-title-wrap'>" +
+                    "           <span class='group-name' data-group-id='" + groupId + "' title='" + escapeHtml(data[i].groupName || '') + "'>" + escapeHtml(data[i].groupName) + "</span>" +
+                    "           <div class='group-actions'>" +
+                    "               <span class='group-add-btn' title='新增按钮' data-group-id='" + groupId + "'>+</span>" +
+                    "               <span class='group-menu-btn' title='分组菜单' data-group-id='" + groupId + "'>⋯</span>" +
+                    "           </div>" +
                     "       </div>" +
                     "   </div>" +
                     "</div>"
