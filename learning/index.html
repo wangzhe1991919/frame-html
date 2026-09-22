@@ -211,6 +211,10 @@
 
     var $grid = $('#audioGrid');
 
+    // 固定访问密钥，需与后端 application.yml 中 learning.access-key 保持一致
+    var ACCESS_KEY = 'wz-learning-audio-2026';
+    var accessGranted = (common.GetRequestParamValue('key') === ACCESS_KEY);
+
     /* ---------------- 工具函数 ---------------- */
     function formatTime(sec) {
         if (!sec || isNaN(sec) || !isFinite(sec)) { return '00:00'; }
@@ -234,7 +238,8 @@
 
     /* ---------------- 加载并渲染列表 ---------------- */
     function loadAudios() {
-        common.ajaxObj($, common.url.listLearningAudio, null, 'POST', function (o) {
+        var url = common.url.listLearningAudio + '?key=' + encodeURIComponent(ACCESS_KEY);
+        common.ajaxObj($, url, null, 'POST', function (o) {
             audioList = (o && o.data) ? o.data : [];
             renderList();
         });
@@ -429,6 +434,10 @@
     $(document).on('mouseup touchend', function () { seeking = false; });
 
     /* ---------------- 初始化 ---------------- */
-    loadAudios();
+    if (!accessGranted) {
+        document.body.innerHTML = '<div class="empty" style="padding-top:120px">访问被拒绝：缺少或错误的访问密钥</div>';
+    } else {
+        loadAudios();
+    }
 })();
 </script>
