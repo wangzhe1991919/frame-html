@@ -39,6 +39,12 @@ var common = {
         insertNoteCreate : "/sysNavigation/saveAndCreateNote",
         getNote : "/sysNavigation/getNote",
 
+        getLearningAudio : "/learningAudio/get",
+        insertLearningAudio : "/learningAudio/add",
+        updateLearningAudio : "/learningAudio/update",
+        listLearningAudio : "/learningAudio/list",
+        deleteLearningAudio : "/learningAudio/delete",
+
         nlpHome : "/nlp/",
         nlpAnalyzeByModel: "/nlpModel/analyzeByModel",
         nlpLearnOnline: "/nlpModel/learnOnline",
@@ -136,13 +142,19 @@ var common = {
                 if (o.code === 302) {
                     top.window.location.href = common.loginPage;
                 } else if (o.code !== 200) {
-                    alert("状态："+ o.code + ",信息：" + o.message);
+                    alert("状态："+ o.code + ",信息：" + (o.message || "请求失败"));
                 } else {
                     callback(o);
                 }
             },error: function(o) {
                 /*$("body").mLoading("hide");*/
-                alert(o.responseJSON.message);
+                var msg = "请求失败";
+                if (o && o.responseJSON && o.responseJSON.message) {
+                    msg = o.responseJSON.message;
+                } else if (o && o.responseText) {
+                    msg = o.responseText;
+                }
+                alert(msg);
             }
         });
     },
