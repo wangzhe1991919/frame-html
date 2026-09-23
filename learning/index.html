@@ -211,17 +211,6 @@
 
     var $grid = $('#audioGrid');
 
-    // 适配 nginx 反向代理路径前缀（如 /dl/）：
-    // common.js 中 serverUrl 写死为 "http://"+host+"/wz"，会丢失页面所在的代理前缀，
-    // 导致接口请求缺少 /dl 而未被代理。这里基于当前页面路径重新推导为同源的
-    // "/<前缀>/wz"（无前缀时即 "/wz"），同时避免写死协议(http/https)。
-    common.serverUrl = (function () {
-        var path = window.location.pathname;                            // 例如 /dl/learning/index.html
-        var moduleDir = path.substring(0, path.lastIndexOf('/'));       // /dl/learning
-        var prefix = moduleDir.substring(0, moduleDir.lastIndexOf('/')); // /dl（无代理前缀时为空）
-        return prefix + '/wz';
-    })();
-
     // 固定访问密钥，需与后端 application.yml 中 learning.access-key 保持一致
     var ACCESS_KEY = 'wz-learning-audio-2026';
     var accessGranted = (common.GetRequestParamValue('key') === ACCESS_KEY);
